@@ -16,7 +16,9 @@ const Header = () => {
         <div className="flex w-32 justify-end gap-3">
             <SignedOut>
               <Button asChild className='rounded-full' size='lg' >
-                <Link href="/sign-in">Login</Link>
+                <Link href="/sign-in">
+                  Login
+                  </Link>
               </Button>
             </SignedOut>
         </div>
