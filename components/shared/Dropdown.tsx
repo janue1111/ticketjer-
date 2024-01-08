@@ -5,6 +5,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ICategory } from "@/lib/database/models/category.model";
+import { useState } from "react";
 
 type DropdownProps = {
   value?: string;
@@ -12,15 +14,24 @@ type DropdownProps = {
 };
 
 const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
+  const [categories,setCategories] = useState<ICategory[]>([
+    {
+      _id: "",
+      name: "",
+    },
+    
+  ])
   return (
     <Select onValueChange={onChangeHandler} defaultValue={value}>
       <SelectTrigger className="select-field">
         <SelectValue placeholder="Category" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="light">Light</SelectItem>
-        <SelectItem value="dark">Dark</SelectItem>
-        <SelectItem value="system">System</SelectItem>
+        {categories.length > 0 && categories.map((category)=>(
+          <SelectItem key={category._id} value={category._id} className="select-item p-regular-14">
+            {category.name}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );
