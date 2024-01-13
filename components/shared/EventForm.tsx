@@ -22,7 +22,7 @@ import { FileUploader } from "./FileUploader";
 import { useState } from "react";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
-import { Checkbox } from "@/components/ui/checkbox"
+import { Checkbox } from "@/components/ui/checkbox";
 import "react-datepicker/dist/react-datepicker.css";
 
 type EventFormProps = {
@@ -233,27 +233,30 @@ const EventForm = ({ userId, type }: EventFormProps) => {
                       {...field}
                       className="p-regular-16 border-0 bg-grey-50 outline-offset-0 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 "
                     />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="isFree"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <div className="flex items-center">
-                    <label htmlFor="isFree" className="whitespace-nowrap pr-3  leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Free Ticket
-                    </label>
-                  <Checkbox
-                    id="isFree"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    className="mr-2 h-5 w5 border-2 border-primary-500"
+                    <FormField
+                      control={form.control}
+                      name="isFree"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="flex items-center">
+                              <label
+                                htmlFor="isFree"
+                                className="whitespace-nowrap pr-3  leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                              >
+                                Free Ticket
+                              </label>
+                              <Checkbox
+                                id="isFree"
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                className="mr-2 h-5 w5 border-2 border-primary-500"
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                 </FormControl>
