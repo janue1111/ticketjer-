@@ -84,7 +84,7 @@ const EventForm = ({ userId, type }: EventFormProps) => {
             )}
           />
         </div>
-        <div className="fle flex-col gap-5 md:flex-row">
+        <div className="flex flex-col gap-5 md:flex-row">
           <FormField
             control={form.control}
             name="description"
@@ -169,6 +169,37 @@ const EventForm = ({ userId, type }: EventFormProps) => {
                     wrapperClassName="datePicker"
                      />
                   </div>
+                  
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="endDateTime"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <div className="flex-center h-[55px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
+                    <Image
+                      src="/assets/icons/calendar.svg"
+                      alt="calendar"
+                      height={24}
+                      width={24}
+                      className="filter-grey"
+                    />
+                    <p className="ml-3 whitespace-nowrap text-grey-600"> End Date:</p>
+                    <DatePicker 
+                    selected={field.value} 
+                    onChange={(date:Date) => field.onChange(date)}
+                    showTimeSelect
+                    timeInputLabel="Time:"
+                    dateFormat="MM/dd/yyyy h:mm aa"
+                    wrapperClassName="datePicker"
+                     />
+                  </div>
+                  
                 </FormControl>
                 <FormMessage />
               </FormItem>
