@@ -19,12 +19,13 @@ import { eventDefaultValues } from "@/constants";
 import Dropdown from "./Dropdown";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUploader } from "./FileUploader";
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
 import { Checkbox } from "@/components/ui/checkbox";
 import { uploadFiles, useUploadThing } from "@/lib/uploadthing";
 import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/navigation";
 
 type EventFormProps = {
   userId: string;
@@ -33,6 +34,7 @@ type EventFormProps = {
 const EventForm = ({ userId, type }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const initialValues = eventDefaultValues;
+  const router = useRouter();
 
   const { startUpload } = useUploadThing("imageUploader");
   // 1. Define your form.
@@ -61,11 +63,16 @@ const EventForm = ({ userId, type }: EventFormProps) => {
   
     if (type === "Create") {
       try {
-        const newEvent = await CreateEvent({
-          event: { ...initialValues, imageUrl: uploadedImageUrl },
-          userId,
-          path: "/profile",
-        });
+        // const newEvent = await CreateEvent({
+        //   event: { ...initialValues, imageUrl: uploadedImageUrl },
+        //   userId,
+        //   path: "/profile",
+        // })
+        // if(newEvent){
+        //   form.reset();
+        //   router.push("/events/${newEvent._id}");
+          
+        // }
       } catch (error) {
         console.log(error);
       }
