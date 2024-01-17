@@ -23,9 +23,8 @@ import { useState } from "react";
 import Image from "next/image";
 import DatePicker from "react-datepicker";
 import { Checkbox } from "@/components/ui/checkbox";
-import {useUploadThing} from '@/lib/uploadthing'
+import { uploadFiles, useUploadThing } from "@/lib/uploadthing";
 import "react-datepicker/dist/react-datepicker.css";
-
 
 type EventFormProps = {
   userId: string;
@@ -35,7 +34,7 @@ const EventForm = ({ userId, type }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const initialValues = eventDefaultValues;
 
-  const { startUpload } = useUploadThing('imageUploader');
+  const { startUpload } = useUploadThing("imageUploader");
   // 1. Define your form.
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
@@ -44,12 +43,32 @@ const EventForm = ({ userId, type }: EventFormProps) => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    const eventData = values ;
+    const eventData = values;
 
     let uploadedImageUrl = values.imageUrl;
-
-    if(files.length > 0 ){
-      const uploadedImages = await startUpload(files);
+  
+    let uploadedImages;
+  
+    if (files.length > 0) {
+      uploadedImages = await startUpload(files);
+    }
+  
+    if (!uploadedImages) {
+      return;
+    }
+  
+    uploadedImageUrl = uploadedImages[0].url;
+  
+    if (type === "Create") {
+      try {
+        const newEvent = await CreateEvent({
+          event: { ...initialValues, imageUrl: uploadedImageUrl },
+          userId,
+          path: "/profile",
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 
