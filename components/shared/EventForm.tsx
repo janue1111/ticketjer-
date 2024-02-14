@@ -29,8 +29,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useRouter } from "next/navigation";
 
 type EventFormProps = {
-  userId: string;
-  type: "Create" | "Update";
+  userId: string
+  type: "Create" | "Update"
 };
 const EventForm = ({ userId, type }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
@@ -46,40 +46,36 @@ const EventForm = ({ userId, type }: EventFormProps) => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    const eventData = values;
-
     let uploadedImageUrl = values.imageUrl;
   
     let uploadedImages;
   
     if (files.length > 0) {
-      uploadedImages = await startUpload(files);
-    }
+      uploadedImages = await startUpload(files)
+    
   
     if (!uploadedImages) {
       return;
     }
-  
-    uploadedImageUrl = uploadedImages[0].url;
-  
-    
-    if (type === "Create") {
-      try {
-        const newEvent = await createEvent({
-          event: { ...initialValues, imageUrl: uploadedImageUrl },
-          userId,
-          path: "/profile",
-        })
-        if(newEvent){
-          form.reset();
-          router.push("/events/${newEvent._id}");
-          
-        }
-      } catch (error) {
-        console.log(error);
+    uploadedImageUrl = uploadedImages[0].url
+  }
+  if(type === 'Create'){
+    try {
+      const newEvent = await createEvent({
+        event:{...values,imageUrl: uploadedImageUrl},
+        userId,
+        path:'/profile'
+      })
+      if(newEvent){
+        form.reset();
+        router.push(`/event/${newEvent._id}`)
       }
+    } catch (error) {
+      console.log(error);
+      
     }
   }
+}
 
   return (
     <Form {...form}>

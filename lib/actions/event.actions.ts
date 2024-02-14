@@ -33,6 +33,7 @@ export const createEvent = async ({
 
     return JSON.parse(JSON.stringify(newEvent));
   } catch (error) {
+    console.log(error);
     handleError(error);
   }
 };
