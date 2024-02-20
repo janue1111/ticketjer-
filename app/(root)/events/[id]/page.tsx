@@ -24,22 +24,29 @@ const EventDetails = async ({ params: { id } }: SearchParamProps) => {
                 <p className="p-bold-20 rounded-full bg-green-500/10 px-5 py-2 text-green-700 ">
                   {event.isFree ? "Free" : `$${event.price}`}
                 </p>
-                <p className="p-medium-16 rounded-full bg-grey-500/10 px-4 py-2.5 text-grey-500">{event.category.name}</p>
+                <p className="p-medium-16 rounded-full bg-grey-500/10 px-4 py-2.5 text-grey-500">
+                  {event.category.name}
+                </p>
               </div>
               <p className="p-medium-18 ml-2 mt-2 sm:mt-0">
-                by{''}
-                <span className="text-primary-500">{event.organizer.firstName}{event.organizer.lastName}</span>
+                by{""}
+                <span className="text-primary-500">
+                  {event.organizer.firstName}
+                  {event.organizer.lastName}
+                </span>
               </p>
             </div>
           </div>
           {/* checkout button */}
           <div className="flex flex-col gap-5">
             <div className="flex gap-2 md:gap-3">
-                <Image
-                
-                />
+              <Image
+                src="/assets/icons/calendar.svg"
+                alt="calendar"
+                width={32}
+                height={32}
+              />
             </div>
-
           </div>
         </div>
       </div>
