@@ -1,5 +1,6 @@
 import { IEvent } from "@/lib/database/models/event.model";
 import React from "react";
+import Card from "./Card";
 type CollectionProps = {
   data: IEvent[];
   emptyTitle: string;
@@ -25,15 +26,19 @@ const Collection = ({
       {data.length > 0 ? (
         <div className="flex flex-col items-center gap-10">
           <ul className="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:gap-10">
-            {data.map((event)=>{
+            {data.map((event) => {
               const hasOrderLink = collectionType === "Events_Organized";
               const hidePrice = collectionType === "My_Tickets";
 
-              return(
+              return (
                 <li key={event.id} className="flex justify-center">
-                  
-                {/* Render your event data here */}
-              </li>
+                  <Card
+                    event={event.id}
+                    hasOrderLink={hasOrderLink}
+                    hidePrice={hidePrice}
+                  />
+                  {/* Render your event data here */}
+                </li>
               );
             })}
           </ul>
