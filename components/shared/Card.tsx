@@ -3,6 +3,7 @@ import { IEvent } from "@/lib/database/models/event.model";
 import React from "react";
 import { formatDateTime } from "@/lib/utils";
 import Image from "next/image";
+import { auth } from "@clerk/nextjs";
 
 type CardProps = {
   event: IEvent;
@@ -11,6 +12,10 @@ type CardProps = {
 };
 
 const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
+  const {sessionClaims } =auth();
+  const userId = sessionClaims?.userId as string;
+  const isEventCreator = event.organizer._id.toString() === userId;
+
   return (
     <div className="group relative flex min-h-[380px] w-full max-w-[400px] flex-col overflow-hidden rounded-xl bg-white shadow-md transition-all hover:shadow-lg md:min-h-[438px]">
       <Link
@@ -19,6 +24,13 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
         className="flex-center flex-grow bg-gray-50 bg-cover bg-center text-grey-500"
       />
       {/* IS EVENT CREATOR */}
+      {isEventCreator && !hidePrice && (
+        <div className="absolute top-2 right-2 flex flex-col gap-4 rounded-xl bg-white p-3 shadow-sm transition-all">
+          <Link href={`/events/${event._id}/update`}>
+            <Image src="/assets/icons/edit.svg" width={30} height={30} alt="edit"/>
+          </Link>
+          </div>
+        )}
       <Link
         href={`/events/${event._id}`}
         className="flex min-h-[230px] flex-col gap-3 p-5 md:gap-4"
