@@ -4,7 +4,8 @@ import React from "react";
 import { formatDateTime } from "@/lib/utils";
 import Image from "next/image";
 import { auth } from "@clerk/nextjs";
-import DeleteConfirmation from "./DeleteConfirmation";
+import { DeleteConfirmation } from "./DeleteConfirmation";
+
 
 type CardProps = {
   event: IEvent;
