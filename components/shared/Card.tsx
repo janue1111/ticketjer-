@@ -29,7 +29,7 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
       {isEventCreator && !hidePrice && (
         <div className="absolute top-2 right-2 flex flex-col gap-4 rounded-xl bg-white p-3 shadow-sm transition-all">
           <Link href={`/events/${event._id}/update`}>
-            <Image src="/assets/icons/edit.svg" width={30} height={30} alt="edit"/>
+            <Image src="/assets/icons/edit.svg" width={20} height={20} alt="edit"/>
           </Link>
           <DeleteConfirmation eventId={event._id}/>
           </div>
