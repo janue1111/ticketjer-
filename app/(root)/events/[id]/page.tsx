@@ -1,7 +1,9 @@
+import CheckoutButton from "@/components/shared/CheckoutButton";
 import Collection from "@/components/shared/Collection";
 import { getEventById, getRelatedEventsByCategory } from "@/lib/actions/event.actions";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
+import { Check } from "lucide-react";
 import Image from "next/image";
 
 const EventDetails = async ({ params: { id },searchParams }: SearchParamProps) => {
@@ -47,6 +49,9 @@ const EventDetails = async ({ params: { id },searchParams }: SearchParamProps) =
           </div>
         </div>
 
+{/* CHECKOUT BUTTON */}
+        <CheckoutButton event={event}/>
+
 
         <div className="flex flex-col gap-5">
           <div className='flex gap-2 md:gap-3'>
@@ -77,6 +82,7 @@ const EventDetails = async ({ params: { id },searchParams }: SearchParamProps) =
       </div>
     </div>
   </section>
+
   {/* EVENTS WITH SAME CATEGORY */}
   <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
     <h2 className="h2-bold">Related Events</h2>
