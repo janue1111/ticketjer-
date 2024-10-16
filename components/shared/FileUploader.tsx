@@ -1,12 +1,15 @@
 'use client'
 
 import { useCallback, Dispatch, SetStateAction } from 'react'
-import type { FileWithPath } from '@uploadthing/react'
 import { useDropzone } from '@uploadthing/react/hooks'
 import { generateClientDropzoneAccept } from 'uploadthing/client'
 
 import { Button } from '@/components/ui/button'
 import { convertFileToUrl } from '@/lib/utils'
+
+interface FileWithPath extends File {
+  path: string;
+}
 
 type FileUploaderProps = {
   onFieldChange: (url: string) => void
@@ -15,14 +18,15 @@ type FileUploaderProps = {
 }
 
 export function FileUploader({ imageUrl, onFieldChange, setFiles }: FileUploaderProps) {
-  const onDrop = useCallback((acceptedFiles: FileWithPath[]) => {
-    setFiles(acceptedFiles)
-    onFieldChange(convertFileToUrl(acceptedFiles[0]))
-  }, [])
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const filesWithPath = acceptedFiles as FileWithPath[];
+    setFiles(filesWithPath)
+    onFieldChange(convertFileToUrl(filesWithPath[0]))
+  }, [onFieldChange, setFiles])
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: 'image/*' ? generateClientDropzoneAccept(['image/*']) : undefined,
+    accept: generateClientDropzoneAccept(['image/*']),
   })
 
   return (
@@ -52,5 +56,5 @@ export function FileUploader({ imageUrl, onFieldChange, setFiles }: FileUploader
         </div>
       )}
     </div>
-  )
+  );
 }
