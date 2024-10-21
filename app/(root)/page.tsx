@@ -12,7 +12,7 @@ export default async function Home() {
     limit:6
   })
 
-  console.log(events)
+  // console.log(events)
   return (
   <>
   <section className='bg-primary-50 bg-dotted-pattern bg-container py-5 md:py-10'>
