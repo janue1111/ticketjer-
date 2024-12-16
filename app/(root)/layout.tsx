@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   title: 'TicketiHub',
   description: 'TicketiHub is a platform for event management.',
   icons: {
-    icon: '/assets/images/logo.svg'
+    icon: '/assets/images/logo3.svg',
   }
 }
 
