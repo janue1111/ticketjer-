@@ -310,7 +310,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                                 id="isFree"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                className="mr-2 h-5 w5 border-2 border-primary-500"
+                                className="mr-2 h-5 w5 border-2 border-black"
                               />
                             </div>
                           </FormControl>
