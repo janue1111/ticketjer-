@@ -1,5 +1,5 @@
 <div align="center"> <br /> <a href="https://youtu.be/zgGhzuBZOQg" target="_blank">
- <img src="./public/assets/images/mylogo.jpg"
+ <img src="./public/assets/images/tickethub.png"
   alt="Project Banner" /> </a> <br /> <div>
    <img src="https://img.shields.io/badge/-Next.js_14-black?style=for-the-badge&logo=nextdotjs&logoColor=white&color=000000" alt="Next.js" /> 
   <img src="https://img.shields.io/badge/-TypeScript-blue?style=for-the-badge&logo=typescript&logoColor=white&color=3178C6" alt="TypeScript" /> 
@@ -131,7 +131,7 @@ Replace the placeholder values with your actual credentials
 **Running the Project**
 
 ```bash
-npm start
+npm run dev 
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to view the project.
