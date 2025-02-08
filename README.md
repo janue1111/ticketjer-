@@ -27,7 +27,7 @@ TicketiHub is a robust, full-stack application for event management and ticketin
 - Securely purchase tickets via Stripe.
 - Effortlessly create, update, and manage events.
 - Explore curated related events to enhance engagement.
-- Whether you’re an event organizer or attendee, TicketiHub offers a streamlined, scalable, and secure experience tailored for everyone.
+- Whether you’re an event organizer or attendee, TicketiHub offers a streamlined, scalable, and secure expterience tailored for everyone.
 
 ## <a name="tech-stack">⚙️ Tech Stack</a>
 
@@ -35,7 +35,7 @@ TicketiHub is a robust, full-stack application for event management and ticketin
 - Next.js
 - TypeScript
 - TailwindCSS
-- Stripe
+- Strookjes o
 - Zod
 - React Hook Form
 - Shadcn
