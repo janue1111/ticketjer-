@@ -1,24 +1,40 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-export default authMiddleware({
-  publicRoutes:[
-    '/',
-    '/events/:id',
-    '/api/webhook/clerk',
-    '/api/webhook/stripe',
-    '/api/uploadthing',
-    '/success' 
-  ],
-  ignoredRoutes:[
-    '/api/webhook/clerk',
-    '/api/webhook/stripe',
-    '/api/uploadthing'
-  ]
-});
+
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/events(.*)', // Esto cubre /events/:id y cualquier subruta
+  '/success',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+])
+
+
+const isIgnoredRoute = createRouteMatcher([
+  '/api/webhook/clerk',
+  '/api/webhook/stripe', 
+  '/api/uploadthing',
+])
+
+export default clerkMiddleware((auth, request) => {
+  // Si es una ruta ignorada, no hacer nada
+  if (isIgnoredRoute(request)) {
+    return
+  }
+  
+  
+  if (!isPublicRoute(request)) {
+    auth().protect()
+  }
+})
 
 export const config = {
   matcher: [
-    '/((?!api/webhook|api/uploadthing|_next/static|_next/image|favicon.ico).*)',
+    // Excluye archivos con extensiones (imágenes, CSS, JS, etc.)
+    // Excluye carpetas de Next.js (_next)
+    // Incluye todas las rutas de páginas y API
+    '/((?!.*\\..*|_next).*)',
     '/',
+    '/(api|trpc)(.*)'
   ],
-};
+}
