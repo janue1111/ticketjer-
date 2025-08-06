@@ -26,12 +26,13 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
               name: order.eventTitle
             }
           },
-          quantity: 1
+          quantity: order.quantity 
         },
       ],
       metadata: {
         eventId: order.eventId,
         buyerId: order.buyerId,
+        quantity: order.quantity.toString(),
       },
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/success`,

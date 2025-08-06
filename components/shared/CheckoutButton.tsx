@@ -9,7 +9,7 @@ import { Button } from '../ui/button'
 import Link from 'next/link'
 import Checkout from './Checkout'
 
-const CheckoutButton = ({event}: {event:IEvent}) => {
+    const CheckoutButton = ({event, quantity}: {event:IEvent, quantity: number}) => {
     const {user} = useUser();
     const userId = user?.publicMetadata.userId as string;
     const hasEventFinished = new Date(event.endDateTime) < new Date();
@@ -30,7 +30,8 @@ const CheckoutButton = ({event}: {event:IEvent}) => {
             </SignedOut>
 
             <SignedIn>
-                <Checkout event={event} userId={userId}/>
+            <Checkout event={event} userId={userId} quantity={quantity}/>
+
 
             </SignedIn>
             </>

@@ -1,3 +1,4 @@
+
 import stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { createOrder } from '@/lib/actions/order.actions'
@@ -16,22 +17,39 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'Webhook error', error: err })
   }
 
-  // Get the ID and type
+  
   const eventType = event.type
 
-  // CREATE
+  
   if (eventType === 'checkout.session.completed') {
-    const { id, amount_total, metadata } = event.data.object
+    
 
+    const session = event.data.object as stripe.Checkout.Session;
+
+    
+    const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
+      session.id,
+      {
+        expand: ['line_items'], // <-- La clave para obtener la cantidad
+      }
+    );
+    
+    
+    const quantity = sessionWithLineItems.line_items?.data[0]?.quantity || 1;
+
+   
+
+    
     const order = {
-      stripeId: id,
-      eventId: metadata?.eventId || '',
-      buyerId: metadata?.buyerId || '',
-      totalAmount: amount_total ? (amount_total / 100).toString() : '0',
+      stripeId: session.id,
+      eventId: session.metadata?.eventId || '',
+      buyerId: session.metadata?.buyerId || '',
+      totalAmount: session.amount_total ? (session.amount_total / 100).toString() : '0',
       createdAt: new Date(),
-      eventTitle: metadata?.eventTitle || '', // Add eventTitle
-      price: amount_total ? (amount_total / 100).toString() : '0', // Add price
-      isFree: amount_total === 0, // Add isFree
+      eventTitle: session.metadata?.eventTitle || '', 
+      price: session.amount_total ? (session.amount_total / 100).toString() : '0', 
+      isFree: session.amount_total === 0, 
+      quantity: quantity, 
     }
 
     const newOrder = await createOrder(order)
