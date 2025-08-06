@@ -13,7 +13,7 @@ import User from '../database/models/user.model';
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-  const serverUrl = process.env.NODE_ENV === 'production' 
+  const serverUrl = process.env.VERCEL_ENV === 'production' 
   ? process.env.NEXT_PUBLIC_SERVER_URL_PROD!
   : process.env.NEXT_PUBLIC_SERVER_URL_DEV!;
 
