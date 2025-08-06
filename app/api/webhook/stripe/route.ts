@@ -2,9 +2,16 @@ import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { createOrder } from '@/lib/actions/order.actions'
 
+// --- CAMBIO AÑADIDO ---
+// Especifica el runtime para evitar problemas con el body parser
+export const runtime = 'nodejs';
+// --------------------
+
+// El resto de tu código se queda igual
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(request: Request) {
+  // ... tu función POST sin cambios ...
   const body = await request.text()
   const sig = request.headers.get('stripe-signature') as string
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -22,7 +29,6 @@ export async function POST(request: Request) {
   if (eventType === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
 
-    // Recuperar la sesión completa para obtener los line_items
     const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
       session.id,
       { expand: ['line_items'] }
@@ -45,10 +51,3 @@ export async function POST(request: Request) {
 
   return new Response('', { status: 200 })
 }
-
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
