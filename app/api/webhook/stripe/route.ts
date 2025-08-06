@@ -9,9 +9,7 @@ export async function POST(request: Request) {
   const body = await request.text()
 
   const sig = request.headers.get('stripe-signature') as string
-    const endpointSecret = process.env.NODE_ENV === 'production' 
-    ? process.env.STRIPE_WEBHOOK_SECRET_PROD!
-    : process.env.STRIPE_WEBHOOK_SECRET_DEV!
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
   let event
 
@@ -34,7 +32,7 @@ export async function POST(request: Request) {
     const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
       session.id,
       {
-        expand: ['line_items'], // <-- La clave para obtener la cantidad
+        expand: ['line_items'], 
       }
     );
     
