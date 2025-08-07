@@ -119,6 +119,7 @@ export type CreateUserParams = {
     buyerId: string
     totalAmount: string
     createdAt: Date
+    quantity: number
   }
   
   export type GetOrdersByEventParams = {
@@ -148,3 +149,19 @@ export type CreateUserParams = {
     params: { id: string }
     searchParams: { [key: string]: string | string[] | undefined }
   }
+
+export interface IOrder extends Document {
+  createdAt: Date
+  stripeId: string
+  totalAmount: string
+  event: {
+    _id: string
+    title: string
+  }
+  buyer: {
+    _id: string
+    firstName: string
+    lastName: string
+  }
+  quantity: number
+}

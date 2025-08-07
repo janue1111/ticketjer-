@@ -29,12 +29,7 @@ export async function POST(request: Request) {
   if (eventType === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session
 
-    const sessionWithLineItems = await stripe.checkout.sessions.retrieve(
-      session.id,
-      { expand: ['line_items'] }
-    )
-    
-    const quantity = sessionWithLineItems.line_items?.data[0]?.quantity || 1
+    const quantity = Number(session.metadata?.quantity) || 1;
 
     const order = {
       stripeId: session.id,

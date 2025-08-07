@@ -45,6 +45,10 @@ const OrderSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  quantity: {
+    type: Number,
+    required: true,
+  },
 })
 
 const Order = models.Order || model('Order', OrderSchema)

@@ -50,9 +50,12 @@ export const createOrder = async (order: CreateOrderParams) => {
     await connectToDatabase();
     
     const newOrder = await Order.create({
-      ...order,
+      stripeId: order.stripeId,
+      totalAmount: order.totalAmount,
       event: order.eventId,
       buyer: order.buyerId,
+      quantity: order.quantity,
+      createdAt: order.createdAt,
     });
 
     return JSON.parse(JSON.stringify(newOrder));
