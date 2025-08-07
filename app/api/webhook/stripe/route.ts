@@ -30,6 +30,8 @@ export async function POST(request: Request) {
     );
     
     const quantity = sessionWithLineItems.line_items?.data[0]?.quantity || 1;
+
+    console.log('=== STRIPE WEBHOOK DEBUG ===', { quantity, lineItems: sessionWithLineItems.line_items?.data });
     
     const order = {
       stripeId: id,
@@ -40,7 +42,11 @@ export async function POST(request: Request) {
       quantity: quantity
     };
 
+    console.log('Order object before saving:', order);
+
     const newOrder = await createOrder(order);
+
+    console.log('Order saved to DB:', newOrder);
     
     return NextResponse.json({ message: 'OK', order: newOrder });
   }
