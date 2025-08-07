@@ -24,7 +24,7 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
       <Link
         href={`/events/${event._id}`}
         style={{ backgroundImage: `url(${event.imageUrl})` }}
-        className="flex-center flex-grow bg-gray-50 bg-cover bg-center text-grey-500"
+        className="flex-center flex-grow bg-gray-50 bg-contain bg-center bg-no-repeat text-grey-500"
       />
       {orderQuantity && orderQuantity > 1 && (
         <div className="absolute right-2 top-2 flex flex-col items-center justify-center rounded-full bg-primary-500 p-1 text-white shadow-lg"
