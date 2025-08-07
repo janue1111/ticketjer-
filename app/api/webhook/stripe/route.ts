@@ -47,6 +47,8 @@ export async function POST(request: Request) {
     const newOrder = await createOrder(order);
 
     console.log('Order saved to DB:', newOrder);
+
+    console.log('About to return response to Stripe');
     
     return NextResponse.json({ message: 'OK', order: newOrder });
   }

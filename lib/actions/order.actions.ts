@@ -52,7 +52,10 @@ export const createOrder = async (order: CreateOrderParams) => {
     await connectToDatabase();
     
     const newOrder = await Order.create({
-      ...order,
+      stripeId: order.stripeId,
+      totalAmount: order.totalAmount,
+      createdAt: order.createdAt,
+      quantity: order.quantity,
       event: order.eventId,
       buyer: order.buyerId,
     });
