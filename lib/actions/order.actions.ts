@@ -10,12 +10,9 @@ import Event from '../database/models/event.model';
 import {ObjectId} from 'mongodb';
 import User from '../database/models/user.model';
 
+
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-  const serverUrl = process.env.VERCEL_ENV === 'production' 
-  ? process.env.NEXT_PUBLIC_SERVER_URL_PROD!
-  : process.env.NEXT_PUBLIC_SERVER_URL_DEV!;
 
   const price = order.isFree ? 0 : Number(order.price) * 100;
 
@@ -30,17 +27,18 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
               name: order.eventTitle
             }
           },
-          quantity: order.quantity 
+          
+          quantity: order.quantity, 
         },
       ],
       metadata: {
         eventId: order.eventId,
         buyerId: order.buyerId,
-        quantity: order.quantity.toString(),
       },
       mode: 'payment',
-      success_url: `${serverUrl}/success`,
-      cancel_url: `${serverUrl}/`,
+      
+      success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
     });
 
     redirect(session.url!)
