@@ -7,6 +7,7 @@ export const runtime = 'nodejs';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
+  console.log('🚀 WEBHOOK CALLED - START');
   const body = await request.text();
   const sig = request.headers.get('stripe-signature') as string;
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -53,5 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: 'OK', order: newOrder });
   }
 
+  console.log('🚀 WEBHOOK CALLED - END');
+  
   return new Response('', { status: 200 });
 }
