@@ -13,6 +13,7 @@ export interface IOrder extends Document {
     firstName: string
     lastName: string
   }
+  quantity: number;
 }
 
 export type IOrderItem = {
