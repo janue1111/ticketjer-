@@ -76,7 +76,7 @@ export type CreateUserParams = {
     page: number | string
   }
   
-  export type Event = {
+    export type Event = {
     _id: string
     title: string
     description: string
@@ -96,6 +96,7 @@ export type CreateUserParams = {
       _id: string
       name: string
     }
+    orderQuantity?: number;
   }
   
   // ====== CATEGORY PARAMS

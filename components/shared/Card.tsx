@@ -11,9 +11,10 @@ type CardProps = {
   event: IEvent;
   hasOrderLink?: boolean;
   hidePrice?: boolean;
+  orderQuantity?: number;
 };
 
-const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
+const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
   const {sessionClaims } =auth();
   const userId = sessionClaims?.userId as string;
   const isEventCreator = event.organizer._id.toString() === userId;
@@ -25,6 +26,12 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
         style={{ backgroundImage: `url(${event.imageUrl})` }}
         className="flex-center flex-grow bg-gray-50 bg-cover bg-center text-grey-500"
       />
+      {orderQuantity && orderQuantity > 1 && (
+        <div className="absolute right-2 top-2 flex flex-col items-center justify-center rounded-full bg-primary-500 p-1 text-white shadow-lg"
+             style={{ width: '30px', height: '30px' }}>
+          <span className="text-xs font-bold">x{orderQuantity}</span>
+        </div>
+      )}
       {/* IS EVENT CREATOR */}
       {isEventCreator && !hidePrice && (
         <div className="absolute top-2 right-2 flex flex-col gap-4 rounded-xl bg-white p-3 shadow-sm transition-all">
@@ -41,7 +48,7 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
           className="flex gap-2"
         >
           <span className="p-semibold-14 w-min rounded-full bg-green-100 px-4 py-1 text-green-60">
-            {event.isFree ? 'FREE' : `$${event.price}`}
+            {event.isFree ? 'FREE' : `${event.price}`}
           </span>
           <p className="p-semibold-14 w-min rounded-full bg-grey-500/10 px-4 py-1 text-grey-500 line-clamp-1">
             {event.category.name}
@@ -49,6 +56,13 @@ const Card = ({ event, hasOrderLink, hidePrice }: CardProps) => {
 
         </div>
         }
+        {hidePrice && orderQuantity && (
+          <div className="flex gap-2">
+            <span className="p-semibold-14 w-min rounded-full bg-grey-500/10 px-4 py-1 text-grey-500">
+              x{orderQuantity}
+            </span>
+          </div>
+        )}
         <p className="p-medium-16 p-medium-18 text-grey-500">
           {formatDateTime(event.startDateTime).dateTime}
         </p>
