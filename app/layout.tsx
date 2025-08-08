@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
-import './globals.css'
 import { ClerkProvider } from '@clerk/nextjs'
+import { esES } from "@clerk/localizations";
+import './globals.css'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -10,8 +11,8 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'TicketiHub',
-  description: 'TicketiHub is a platform for event management.',
+  title: 'Ticketjer',
+  description: 'Ticketjer es una plataforma para la gestión de eventos.',
   icons: {
     icon: '/assets/images/logo.svg'
   }
@@ -23,10 +24,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-        <html lang="en">
-          <body className={poppins.variable}>{children}</body>
-        </html>
-      </ClerkProvider>
+    <ClerkProvider localization={esES}>
+      <html lang="es">
+        <body className={poppins.variable}>{children}</body>
+      </html>
+    </ClerkProvider>
   )
 }
