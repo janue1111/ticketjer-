@@ -19,10 +19,10 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
  const isEventCreator = event.organizer._id.toString() === userId;
 
  return (
-<div className="bg-white rounded-xl shadow-md overflow-hidden w-full max-w-[400px] h-[480px] flex flex-col">
- {/* Imagen principal -65% del espacio */}
-<Link href={`/events/${event._id}`} className="block h-[65%]">
-<div className="relative h-full w-full">
+<div className="bg-white rounded-xl shadow-md overflow-hidden w-full max-w-[400px]">
+ {/* Imagen principal con esquinas superiores redondeadas */}
+<Link href={`/events/${event._id}`} className="block">
+<div className="relative h-48 w-full">
 <Image src={event.imageUrl}
  alt={event.title}
  layout="fill"
@@ -49,29 +49,39 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
 </div>
 </Link>
 
- {/* Contenido textual -35% del espacio */}
-<div className="p-5 h-[35%] flex flex-col">
- {/* Grupo de badges (fecha y categoría) */}
-<div className="flex gap-2 mb-3">
- {/* Badge de fecha */}
-<div className="flex items-center bg-gray-100 px-3 py-1 rounded-full text-gray-600 text-xs">
+ {/* Contenedor de contenido con fondo blanco y padding */}
+<div className="p-5">
+ {/* Etiquetas unificadas con íconos */}
+<div className="flex flex-wrap gap-2 mb-3">
+ {/* Etiqueta de Fecha y Hora */}
+<div className="flex items-center bg-gray-50 px-3 py-1 rounded-lg text-gray-600 text-xs">
 <Image src="/assets/icons/calendar.svg" alt="calendar" width={14} height={14} className="mr-1"
  />
 <span>{formatDateTime(event.startDateTime).dateTime}</span>
 </div>
- {/* Badge de categoría */}
-<div className="bg-gray-100 px-3 py-1 rounded-full text-xs text-gray-600">
- {event.category.name}
+ {/* Etiqueta de Categoría */}
+<div className="flex items-center bg-gray-50 px-3 py-1 rounded-lg text-gray-600 text-xs">
+<Image src="/assets/icons/link.svg" alt="category" width={14} height={14} className="mr-1"
+ />
+<span>{event.category.name}</span>
 </div>
+ {/* Etiqueta de Precio */}
+ {!hidePrice && (
+<div className="flex items-center bg-gray-50 px-3 py-1 rounded-lg text-gray-600 text-xs">
+<Image src="/assets/icons/dollar.svg" alt="price" width={14} height={14} className="mr-1"
+ />
+<span>{event.isFree ? 'GRATIS' : `$${event.price}`}</span>
+</div>
+ )}
 </div>
 
  {/* Título del evento */}
-<Link href={`/events/${event._id}`} className="mb-2">
-<h3 className="text-xl font-bold line-clamp-2">{event.title}</h3>
+<Link href={`/events/${event._id}`}>
+<h3 className="text-lg font-bold mb-2 line-clamp-2">{event.title}</h3>
 </Link>
 
- {/* Ubicación */}
-<p className="text-gray-600 mb-2 flex items-center text-sm">
+ {/* Ubicación - usando un placeholder ya que no está en el modelo actual */}
+<p className="text-gray-600 mb-2 flex items-center">
 <svg xmlns="http://www.w3.org/2000/svg"
  className="h-4 w-4 mr-1"
  viewBox="002020"
@@ -84,17 +94,14 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
 </svg>
  Ubicación del evento</p>
 
- {/* Precio */}
- {!hidePrice && (
-<p className="text-lg font-semibold mt-auto">
- {event.isFree ? 'GRATIS' : `Desde $${event.price}`}
+ {/* Organizador y enlace de pedido */}
+<div className="flex justify-between items-center mt-4">
+<p className="text-sm text-gray-500">
+ Organizado por: {event.organizer.firstName} {event.organizer.lastName}
 </p>
- )}
-
- {/* Enlace de pedido */}
  {hasOrderLink && (
 <Link href={`orders?eventId=${event._id}`}
- className="flex items-center text-primary-500 text-sm mt-2"
+ className="flex items-center text-primary-500 text-sm"
  >
  Detalles del pedido<Image src="/assets/icons/arrow.svg"
  alt="search"
@@ -104,6 +111,7 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
  />
 </Link>
  )}
+</div>
 </div>
 </div>
  );
