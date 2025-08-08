@@ -6,7 +6,7 @@ import { SearchParamProps } from "@/types";
 import { Check } from "lucide-react";
 import Image from "next/image";
 
-const EventDetails = async ({ params: { id },searchParams }: SearchParamProps) => {
+const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) => {
   const event = await getEventById(id);
 
   const relatedEvents = await getRelatedEventsByCategory({

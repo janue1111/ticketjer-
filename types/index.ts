@@ -147,22 +147,6 @@ export type CreateUserParams = {
   }
   
   export type SearchParamProps = {
-    params: { id: string }
-    searchParams: { [key: string]: string | string[] | undefined }
-  }
-
-export interface IOrder extends Document {
-  createdAt: Date
-  stripeId: string
-  totalAmount: string
-  event: {
-    _id: string
-    title: string
-  }
-  buyer: {
-    _id: string
-    firstName: string
-    lastName: string
-  }
-  quantity: number
-}
+    params: { id: string };
+    searchParams: { [key: string]: string | string[] | undefined };
+  };
