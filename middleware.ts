@@ -1,27 +1,17 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-export default authMiddleware({
-  // Asegúrate de que todas estas rutas, incluida la de inicio y éxito, sean públicas.
-  publicRoutes: [
-    '/',
-    '/events/:id',
-    '/api/webhook/clerk',
-    '/api/webhook/stripe',
-    '/api/uploadthing',
-    '/success',
-  ],
+// Define las rutas que no estarán protegidas
+const isProtectedRoute = createRouteMatcher([
+  '/events/:id/update',
+  '/events/create',
+  '/orders',
+  '/profile',
+]);
 
-  // Rutas que Clerk debe ignorar completamente.
-  ignoredRoutes: [
-    '/api/webhook/clerk',
-    '/api/webhook/stripe',
-    '/api/uploadthing',
-  ],
+export default clerkMiddleware((auth, req) => {
+  if (isProtectedRoute(req)) auth().protect();
 });
 
 export const config = {
-  // El matcher protege todas las rutas por defecto, incluidas las rutas de la API.
-  // Esto asegura que el middleware se ejecute en casi todo, EXCEPTO en las rutas
-  // que explícitamente ignoramos para evitar interferencias.
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: ['/((?!.*\..*|_next).*)', '/', '/(api|trpc)(.*)'],
 };
