@@ -28,14 +28,14 @@ const Collection = ({
  {data.length >0 ? (
 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 <div className="flex flex-col items-center gap-10">
-<ul className="grid w-full grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+      <ul className="grid w-full grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
  {data.map((event) => {
  const hasOrderLink = collectionType === "Events_Organized";
  const hidePrice = collectionType === "My_Tickets";
  const orderQuantity = (event as any).orderQuantity;
 
  return (
-<li key={event._id} className="flex justify-center">
+        <li key={event._id} className="w-full">
 <Card event={event}
  hasOrderLink={hasOrderLink}
  hidePrice={hidePrice}
