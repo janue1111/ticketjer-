@@ -1,6 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-// Define las rutas que no estarán protegidas
+// Define las rutas que estarán protegidas
 const isProtectedRoute = createRouteMatcher([
   '/events/:id/update',
   '/events/create',
@@ -13,5 +13,5 @@ export default clerkMiddleware(async (auth, req) => {
 });
 
 export const config = {
-  matcher: ['/((?!.*\..*|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: ['/((?!.+\.[\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };
