@@ -6,12 +6,7 @@ import { SearchParamProps } from "@/types";
 import { Check } from "lucide-react";
 import Image from "next/image";
 
-type EventDetailsProps = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
-
-const EventDetails = async ({ params: { id }, searchParams }: EventDetailsProps) => {
+const EventDetails = async ({ params, searchParams }: { params: { id: string }; searchParams: { [key: string]: string | string[] | undefined }; }) => {
   const event = await getEventById(id);
 
   const relatedEvents = await getRelatedEventsByCategory({
