@@ -9,10 +9,7 @@ const nextConfig = {
                 port:''
             }
         ]
-    },
-    typescript: {
-        ignoreBuildErrors: true,
-    },
+    }
 }
 
 module.exports = nextConfig

@@ -7,6 +7,7 @@ import { Check } from "lucide-react";
 import Image from "next/image";
 
 const EventDetails = async ({ params, searchParams }: { params: { id: string }; searchParams: { [key: string]: string | string[] | undefined }; }) => {
+  const { id } = params;
   const event = await getEventById(id);
 
   const relatedEvents = await getRelatedEventsByCategory({
