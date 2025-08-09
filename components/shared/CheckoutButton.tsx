@@ -18,13 +18,13 @@ const CheckoutButton = ({event}: {event:IEvent}) => {
     <div className='flex items-center gap-3'>
         {/* WE cant buy past events */}
         {hasEventFinished ? (
-            <p className='p-2 text-red-400'> Sorry, tickets are no longer available .</p>
+            <p className='p-2 text-red-400'> Lo sentimos, las entradas ya no están disponibles.</p>
         ):(
             <>
             <SignedOut>
                 <Button asChild className='button rounded-full' size="lg">
                     <Link href="/sign-in">
-                        Get Tickets
+                        Comprar Entradas
                     </Link>
                 </Button>
             </SignedOut>

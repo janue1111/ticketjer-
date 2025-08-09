@@ -27,14 +27,14 @@ export default async function Home({searchParams}: SearchParamProps) {
   <div className='wrapper grid grid-cols-1 gap-5 md:grid-cols-2 2xl:gap-0'>
     <div className='flex flex-col justify-center gap-8'>
       <h1 className='h1-bold'>
-        Discover, Connect, and Celebrate with TicketiHub
+        Descubre, conecta y celebra con TICKETJER
       </h1>
       <p className='p-regular-20 md:p-regular-24'>
-        Join a community of event enthusiasts and gain access to 3,016+ curated events and opportunities to connect with world-class organizers.
+        Encuentra eventos de cumbia buenos,bonitos y al mejor precio de el mercado.
       </p>
       <Button size="lg" asChild className="button w-full sm:w-fit">
         <Link href="#events">
-          Browse Events
+          Buscar Eventos
         </Link>
       </Button>
     </div>
@@ -49,7 +49,7 @@ export default async function Home({searchParams}: SearchParamProps) {
 </section>
 <section id='events' className='wrapper my-8 flex flex-col gap-8 md:gap-12'>
   <h2 className='h3-bold'>
-    Thousands of Events
+    Eventos
   </h2>
   <div className='flex w-full flex-col gap-5 md:flex-row'>
     <Search/>
@@ -57,8 +57,8 @@ export default async function Home({searchParams}: SearchParamProps) {
   </div>
   <Collection
     data={events?.data}
-    emptyTitle="No Events Available"
-    emptyStateSubtext="Check back soon for more amazing events!"
+    emptyTitle="No hay eventos disponibles"
+    emptyStateSubtext="¡Vuelve pronto para ver más eventos increíbles!"
     collectionType="All_Events"
     limit={6}
     page={page}

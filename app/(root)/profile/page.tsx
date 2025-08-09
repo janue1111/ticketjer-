@@ -19,7 +19,7 @@ const ProfilePage = async ({searchParams}: SearchParamProps) => {
 
     const orders = await getOrdersByUser({userId,page:1})
 
-    const orderedEvents = orders?.data.map((order:IOrder)=> ({ ...order.event, orderQuantity: order.quantity })) || [];
+    const orderedEvents = orders?.data || [];
 
     const organizedEvents  = await getEventsByUser({userId,page:1})
 
@@ -29,10 +29,10 @@ const ProfilePage = async ({searchParams}: SearchParamProps) => {
     {/* My tickets */}
     <section className='bg-primary-50 bg-dotted-pattern bg-cover bg-center py-5 md:py-10'>
         <div className='wrapper flex items-center justify-center sm:justify-between'>
-            <h3 className='h3-bold text-center sm:text-left'>My Tickets</h3>
+            <h3 className='h3-bold text-center sm:text-left'>Mis Entradas</h3>
             <Button asChild size="lg" className='button hidden sm:flex'>
                 <Link href="/#events">
-                    Explore More Events
+                    Explorar más eventos
                 </Link>
                 
             </Button>

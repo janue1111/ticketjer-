@@ -50,7 +50,7 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
   };
 
   return (
-    <form action={onCheckout} method="post">
+    <form action={onCheckout}>
       <div className="flex items-center gap-3">
         <p className="whitespace-nowrap">Cantidad:</p>
         <Input
@@ -60,7 +60,7 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
           className="w-16 text-center rounded-md"
         />
         <Button type="submit" role="link" size="lg" className="button sm:w-fit">
-          {event.isFree ? "Get Ticket" : "Buy Ticket"}
+          {event.isFree ? "Obtener Entrada" : "Comprar Entrada"}
         </Button>
       </div>
     </form>
