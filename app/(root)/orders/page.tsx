@@ -6,8 +6,9 @@ import { IOrderItem } from '@/lib/database/models/order.model'
 import Image from "next/image"
 
 const Orders = async ({ searchParams }: SearchParamProps) => {
-  const eventId = (searchParams?.eventId as string) || ''
-  const searchText = (searchParams?.query as string) || ''
+  const resolvedSearchParams = (await searchParams) ?? {}
+  const eventId = (resolvedSearchParams?.eventId as string) || ''
+  const searchText = (resolvedSearchParams?.query as string) || ''
 
   const orders = await getOrdersByEvent({ eventId, searchString: searchText })
 
