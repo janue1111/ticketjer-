@@ -11,8 +11,8 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'TicketiHub',
-  description: 'TicketiHub is a platform for event management.',
+  title: 'Ticketjer',
+  description: 'Ticketjer te ayuda a comprar entradas de tus eventos favoritos.',
   icons: {
     icon: '/assets/images/logoelbueno.jpg',
   }

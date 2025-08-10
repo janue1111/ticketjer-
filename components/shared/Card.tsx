@@ -1,8 +1,8 @@
 "use client";
 import Link from "next/link";
 import { IEvent } from "@/lib/database/models/event.model";
-import React from "react";
-import { formatDateTime } from "@/lib/utils";
+import React, { useCallback } from "react";
+import { formatDateTime, pushToDataLayer } from "@/lib/utils";
 import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 import { DeleteConfirmation } from "./DeleteConfirmation";
@@ -18,10 +18,27 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
  const { userId } = useAuth();
  const isEventCreator = event.organizer._id.toString() === userId;
 
+  const handleViewItemClick = useCallback(() => {
+    const unitPrice = event.isFree ? 0 : parseFloat(event.price || "0");
+    pushToDataLayer("view_item", {
+      currency: "PEN",
+      value: unitPrice,
+      items: [
+        {
+          item_id: event._id,
+          item_name: event.title,
+          item_category: event.category?.name,
+          price: unitPrice,
+          quantity: 1,
+        },
+      ],
+    });
+  }, [event]);
+
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
       {/* Imagen superior cuadrada con cover */}
-      <Link href={`/events/${event._id}`} className="block">
+      <Link href={`/events/${event._id}`} className="block" onClick={handleViewItemClick}>
         <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-t-2xl">
           <Image
             src={event.imageUrl}
@@ -61,7 +78,7 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
           </div>
         </div>
 
-        <Link href={`/events/${event._id}`} className="mb-1">
+        <Link href={`/events/${event._id}`} className="mb-1" onClick={handleViewItemClick}>
           <h3 className="text-sm sm:text-base font-semibold truncate">{event.title}</h3>
         </Link>
 

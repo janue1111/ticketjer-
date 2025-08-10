@@ -13,7 +13,7 @@ const Footer = () => {
         height={38}
         />
       </Link>
-      <p>2024 TicketiHub. All Rights reserved</p>
+      <p>2025 TICKETJER. Todos los derechos reservados</p>
      </div>
 
     </footer>

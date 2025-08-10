@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "../ui/button";
 import { IEvent } from "@/lib/database/models/event.model";
 
@@ -42,6 +42,25 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
     await checkoutOrder(order);
   };
 
+  const handleBeginCheckoutClick = useCallback(() => {
+    const unitPrice = event.isFree ? 0 : parseFloat(event.price || "0");
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'begin_checkout',
+      currency: 'PEN',
+      value: unitPrice * quantity,
+      items: [
+        {
+          item_id: event._id,
+          item_name: event.title,
+          item_category: event.category?.name,
+          price: unitPrice,
+          quantity: quantity,
+        },
+      ],
+    });
+  }, [event, quantity]);
+
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
     if (value > 0) {
@@ -59,7 +78,7 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
           onChange={handleQuantityChange}
           className="w-16 text-center rounded-md"
         />
-        <Button type="submit" role="link" size="lg" className="button sm:w-fit">
+        <Button type="submit" role="link" size="lg" className="button sm:w-fit rounded-full bg-red-600 hover:bg-red-700 text-white" onClick={handleBeginCheckoutClick}>
           {event.isFree ? "Obtener Entrada" : "Comprar Entrada"}
         </Button>
       </div>

@@ -91,3 +91,17 @@ export const handleError = (error: unknown) => {
   console.error(error)
   throw new Error(typeof error === 'string' ? error : JSON.stringify(error))
 }
+
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
+export const pushToDataLayer = (event: string, payload: object) => {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ 
+    event,
+    ...payload
+   });
+};

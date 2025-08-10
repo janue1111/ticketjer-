@@ -32,14 +32,14 @@ export default async function Home({searchParams}: SearchParamProps) {
       <p className='p-regular-20 md:p-regular-24'>
         Encuentra eventos de cumbia buenos,bonitos y al mejor precio de el mercado.
       </p>
-      <Button size="lg" asChild className="button w-full sm:w-fit">
+      <Button size="lg" asChild className="button w-full sm:w-fit bg-red-600 hover:bg-red-700 text-white">
         <Link href="#events">
           Buscar Eventos
         </Link>
       </Button>
     </div>
     <Image
-      src="/assets/images/hero.png"
+      src="/assets/images/heroelbueno.jpeg"
       alt="Discover exciting events"
       width={1000}
       height={1000}
