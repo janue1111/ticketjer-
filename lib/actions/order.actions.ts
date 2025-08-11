@@ -1,5 +1,6 @@
 "use server"
 
+import crypto from 'crypto';
 import Stripe from 'stripe';
 import { CheckoutOrderParams, CreateOrderParams, GetOrdersByEventParams, GetOrdersByUserParams } from "@/types"
 import { redirect } from 'next/navigation';
@@ -10,7 +11,7 @@ import Event from '../database/models/event.model';
 import {ObjectId} from 'mongodb';
 import User from '../database/models/user.model';
 
-export const checkoutOrder = async (order: CheckoutOrderParams) => {
+/*export const checkoutOrder = async (order: CheckoutOrderParams) => {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
   const price = order.isFree ? 0 : Number(order.price) * 100;
@@ -43,6 +44,75 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
   } catch (error) {
     throw error;
   }
+}*/
+
+export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key: string]: string | number }> => {
+  await connectToDatabase();
+
+  // 1. Obtener la fecha y hora actual en formato UTC (AAAAMMDDHHMMSS)
+  const now = new Date();
+  const vads_trans_date = 
+    now.getUTCFullYear().toString() +
+    (now.getUTCMonth() + 1).toString().padStart(2, '0') +
+    now.getUTCDate().toString().padStart(2, '0') +
+    now.getUTCHours().toString().padStart(2, '0') +
+    now.getUTCMinutes().toString().padStart(2, '0') +
+    now.getUTCSeconds().toString().padStart(2, '0');
+
+  // 2. Generar un ID de transacción único de 6 caracteres
+  const vads_trans_id = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+  // 3. Convertir el monto a centavos
+  const amount = order.isFree ? 0 : Number(order.price) * 100;
+
+  // Obtener el email del comprador
+  const buyer = await User.findById(order.buyerId);
+  if (!buyer) {
+    throw new Error('Usuario comprador no encontrado.');
+  }
+  const buyerEmail = buyer.email;
+
+  // 4. Crear el objeto de parámetros para IziPay
+  const vads_params: { [key: string]: string | number } = {
+    vads_action_mode: 'INTERACTIVE',
+    vads_amount: amount,
+    vads_ctx_mode: 'TEST', // O 'PRODUCTION' en producción
+    vads_currency: '604', // PEN
+    vads_page_action: 'PAYMENT',
+    vads_payment_config: 'SINGLE',
+    vads_site_id: process.env.IZIPAY_SITE_ID!,
+    vads_trans_date: vads_trans_date,
+    vads_trans_id: vads_trans_id,
+    vads_version: 'V2',
+    vads_order_id: order.eventId, // Usamos eventId como identificador único de la orden
+    vads_cust_email: buyerEmail,
+  };
+
+  // --- Creación de la cadena para firmar ---
+  const string_params = Object.fromEntries(
+    Object.entries(vads_params).map(([key, value]) => [key, String(value)])
+  );
+
+  const sorted_keys = Object.keys(string_params)
+    .filter(key => key.startsWith('vads_'))
+    .sort();
+
+  const string_to_sign = sorted_keys
+    .map(key => string_params[key])
+    .join('+');
+
+  // --- Cálculo de la firma (Método de Hash simple) ---
+  const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
+  const data_to_hash = string_to_sign + '+' + secretKey;
+
+  const signature = crypto
+    .createHash('sha256')
+    .update(data_to_hash)
+    .digest('base64');
+
+  vads_params['signature'] = signature;
+
+  return vads_params;
 }
 
 export const createOrder = async (order: CreateOrderParams) => {
