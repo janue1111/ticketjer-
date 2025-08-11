@@ -86,6 +86,7 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
     vads_version: 'V2',
     vads_order_id: order.eventId, // Usamos eventId como identificador único de la orden
     vads_cust_email: buyerEmail,
+    vads_cust_id: order.buyerId, // <- AÑADIDO AQUI
   };
 
   // --- Creación de la cadena para firmar ---
