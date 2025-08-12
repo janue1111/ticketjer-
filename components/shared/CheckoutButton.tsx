@@ -15,7 +15,9 @@ const CheckoutButton = ({event}: {event:IEvent}) => {
     const hasEventFinished = new Date(event.endDateTime) < new Date();
 
   const handleBeginCheckoutClick = useCallback(() => {
-    const unitPrice = event.isFree ? 0 : parseFloat(event.price || "0");
+    const activePhase = event.pricingPhases?.find((phase) => phase.active);
+    const prices = activePhase?.tiers?.map((tier) => Number(tier.price)).filter((p) => !Number.isNaN(p)) || [];
+    const unitPrice = prices.length > 0 ? Math.min(...prices) : 0;
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: 'begin_checkout',

@@ -11,14 +11,19 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
   const [quantity, setQuantity] = useState(1);
   const [izipayParams, setIzipayParams] = useState<{[key: string]: string | number} | null>(null);
 
+  // Derivar el precio base desde la fase activa y sus tiers
+  const activePhase = event.pricingPhases?.find((phase) => phase.active);
+  const prices = activePhase?.tiers?.map((tier) => Number(tier.price)).filter((p) => !Number.isNaN(p)) || [];
+  const lowestPrice: number | null = prices.length > 0 ? Math.min(...prices) : null;
+
   const onCheckout = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     const order = {
       eventTitle: event.title,
       eventId: event._id,
-      price: event.price,
-      isFree: event.isFree,
+      price: String(lowestPrice ?? 0),
+      isFree: (lowestPrice ?? 0) === 0,
       buyerId: userId,
       quantity: quantity,
     };
@@ -28,7 +33,7 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
   };
 
   const handleBeginCheckoutClick = useCallback(() => {
-    const unitPrice = event.isFree ? 0 : parseFloat(event.price || "0");
+    const unitPrice = lowestPrice ?? 0;
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
       event: 'begin_checkout',
@@ -44,7 +49,7 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
         },
       ],
     });
-  }, [event, quantity]);
+  }, [event, quantity, lowestPrice]);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -73,7 +78,7 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
           className="w-16 text-center rounded-md"
         />
         <Button type="submit" role="link" size="lg" className="button sm:w-fit rounded-full bg-red-600 hover:bg-red-700 text-white" onClick={handleBeginCheckoutClick}>
-          {event.isFree ? "Obtener Entrada" : "Comprar Entrada"}
+          {(lowestPrice ?? 0) === 0 ? "Obtener Entrada" : "Comprar Entrada"}
         </Button>
       </div>
     </form>
