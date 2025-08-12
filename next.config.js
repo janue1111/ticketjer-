@@ -1,13 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images:{
-        domains:['utfs.io'],
-        remotePatterns:[
+    images: {
+        remotePatterns: [
             {
                 protocol: 'https',
                 hostname: 'utfs.io',
-                port:''
-            }
+            },
+            {
+                protocol: 'https',
+                hostname: 'static.vaope.com',
+            },
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+            },
+
+            {
+                protocol: 'https',
+                hostname: 'i.imgur.com',
+            },
         ]
     }
 }

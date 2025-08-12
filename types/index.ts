@@ -1,4 +1,4 @@
-// ====== USER PARAMS
+"""// ====== USER PARAMS
 export type CreateUserParams = {
     clerkId: string
     firstName: string
@@ -26,9 +26,20 @@ export type CreateUserParams = {
       startDateTime: Date
       endDateTime: Date
       categoryId: string
-      price: string
-      isFree: boolean
       url: string
+      layoutType: 'standard' | 'immersive'
+      pricingPhases: {
+        name: string;
+        active: boolean;
+        description?: string;
+        tiers: {
+          name: string;
+          price: string;
+          originalPrice?: string;
+          description?: string;
+          color?: string;
+        }[];
+      }[];
     }
     path: string
   }
@@ -44,9 +55,20 @@ export type CreateUserParams = {
       startDateTime: Date
       endDateTime: Date
       categoryId: string
-      price: string
-      isFree: boolean
       url: string
+      layoutType: 'standard' | 'immersive'
+      pricingPhases: {
+        name: string;
+        active: boolean;
+        description?: string;
+        tiers: {
+          name: string;
+          price: string;
+          originalPrice?: string;
+          description?: string;
+          color?: string;
+        }[];
+      }[];
     }
     path: string
   }
@@ -79,14 +101,26 @@ export type CreateUserParams = {
     export type Event = {
     _id: string
     title: string
+    slug?: string
     description: string
-    price: string
-    isFree: boolean
     imageUrl: string
     location: string
     startDateTime: Date
     endDateTime: Date
     url: string
+    layoutType: 'standard' | 'immersive'
+    pricingPhases: {
+      name: string;
+      active: boolean;
+      description?: string;
+      tiers: {
+        name: string;
+        price: string;
+        originalPrice?: string;
+        description?: string;
+        color?: string;
+      }[];
+    }[];
     organizer: {
       _id: string
       firstName: string
@@ -149,4 +183,4 @@ export type CreateUserParams = {
   export type SearchParamProps = {
     params?: Promise<{ id: string }>;
     searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-  };
+  };""

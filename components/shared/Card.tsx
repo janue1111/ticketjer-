@@ -14,12 +14,17 @@ type CardProps = {
  orderQuantity?: number;
 };
 
-const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
- const { userId } = useAuth();
- const isEventCreator = event.organizer._id.toString() === userId;
+ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
+  const { userId } = useAuth();
+  const isEventCreator = event.organizer._id.toString() === userId;
+
+  // Precio más bajo de la fase activa
+  const activePhase = event.pricingPhases?.find((phase) => phase.active);
+  const prices = activePhase?.tiers?.map((tier) => Number(tier.price)).filter((p) => !Number.isNaN(p)) || [];
+  const lowestPrice: number | null = prices.length > 0 ? Math.min(...prices) : null;
 
   const handleViewItemClick = useCallback(() => {
-    const unitPrice = event.isFree ? 0 : parseFloat(event.price || "0");
+    const unitPrice = lowestPrice ?? 0;
     pushToDataLayer("view_item", {
       currency: "PEN",
       value: unitPrice,
@@ -33,12 +38,16 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
         },
       ],
     });
-  }, [event]);
+  }, [event, lowestPrice]);
 
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
       {/* Imagen superior cuadrada con cover */}
-      <Link href={`/events/${event._id}`} className="block" onClick={handleViewItemClick}>
+      <Link 
+        href={event.layoutType === 'immersive' && event.slug ? `/eventos-especiales/${event.slug}` : `/events/${event._id}`}
+        className="block" 
+        onClick={handleViewItemClick}
+      >
         <div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-t-2xl">
           <Image
             src={event.imageUrl}
@@ -78,7 +87,11 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
           </div>
         </div>
 
-        <Link href={`/events/${event._id}`} className="mb-1" onClick={handleViewItemClick}>
+        <Link 
+          href={event.layoutType === 'immersive' && event.slug ? `/eventos-especiales/${event.slug}` : `/events/${event._id}`}
+          className="mb-1" 
+          onClick={handleViewItemClick}
+        >
           <h3 className="text-sm sm:text-base font-semibold truncate">{event.title}</h3>
         </Link>
 
@@ -88,7 +101,7 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
 
         {!hidePrice && (
           <p className="mt-auto text-sm sm:text-base font-semibold">
-            {event.isFree ? 'GRATIS' : `Desde S/${event.price}`}
+            {lowestPrice === 0 ? 'GRATIS' : lowestPrice !== null ? `Desde S/${lowestPrice.toFixed(2)}` : 'Consultar precios'}
           </p>
         )}
 

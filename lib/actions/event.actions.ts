@@ -171,3 +171,18 @@ export async function getRelatedEventsByCategory({
     handleError(error)
   }
 }
+
+// GET ONE EVENT BY SLUG
+export async function getEventBySlug(slug: string) {
+  try {
+    await connectToDatabase()
+
+    const event = await populateEvent(Event.findOne({ slug: slug }))
+
+    if (!event) throw new Error('Event not found')
+
+    return JSON.parse(JSON.stringify(event))
+  } catch (error) {
+    handleError(error)
+  }
+}

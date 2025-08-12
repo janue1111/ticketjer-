@@ -1,15 +1,39 @@
 import * as z from "zod"
 
+const tierSchema = z.object({
+  name: z.string().min(3, 'Tier name must be at least 3 characters'),
+  price: z.string(),
+  originalPrice: z.string().optional(),
+  description: z.string().optional(),
+  color: z.string().optional(),
+});
 
-export const eventFormSchema= z.object({
+const pricingPhaseSchema = z.object({
+  name: z.string().min(3, 'Phase name must be at least 3 characters'),
+  active: z.boolean(),
+  description: z.string().optional(),
+  tiers: z.array(tierSchema),
+});
+
+export const eventFormSchema = z.object({
     title: z.string().min(3,'Title must be atleast 3 charccters'),
+    slug: z
+      .string()
+      .min(3, 'Slug must be at least 3 characters')
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
     description: z.string().min(3,'Title must be atleast 3 charccters').max(400,'Descrption must be less than 400 characters'),
     location:z.string().min(3,'Location must be atleast 3 characters').max(400,'Location must be less than 400 characters'),
     imageUrl:z.string(),
+    immersiveImages: z.object({
+      backgroundUrl: z.string().url().optional(),
+      artistUrl: z.string().url().optional(),
+      dateUrl: z.string().url().optional(),
+      zoneMapUrl: z.string().url().optional(),
+    }).optional(),
     startDateTime:z.date(),
     endDateTime:z.date(),
     categoryId:z.string(),
-    price:z.string(),
-    isFree:z.boolean(),
-    url:z.string().url()
+    url:z.string().url(),
+    layoutType: z.enum(['standard', 'immersive']),
+    pricingPhases: z.array(pricingPhaseSchema),
 });

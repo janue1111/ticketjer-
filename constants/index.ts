@@ -15,13 +15,35 @@ export const headerLinks = [
   
   export const eventDefaultValues = {
     title: '',
+     slug: '',
     description: '',
     location: '',
     imageUrl: '',
+     immersiveImages: {
+       backgroundUrl: '',
+       artistUrl: '',
+       dateUrl: '',
+       zoneMapUrl: '',
+     },
     startDateTime: new Date(),
     endDateTime: new Date(),
     categoryId: '',
-    price: '',
-    isFree: false,
     url: '',
+    layoutType: 'standard',
+    pricingPhases: [
+      {
+        name: 'PRECIO REGULAR',
+        active: true,
+        description: '',
+        tiers: [
+          {
+            name: 'ENTRADA GENERAL',
+            price: '',
+            originalPrice: '',
+            description: '',
+            color: 'bg-blue-500'
+          }
+        ]
+      }
+    ]
   }
