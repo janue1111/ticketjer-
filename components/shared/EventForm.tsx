@@ -128,12 +128,26 @@ const TierFields = ({ nestIndex, control }: { nestIndex: number; control: Contro
 
 const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const initialValues =
+  const initialValues: z.infer<typeof eventFormSchema> =
     event && type === "Update"
       ? {
-          ...event,
+          title: event.title,
+          slug: event.slug || '',
+          description: event.description || '',
+          location: event.location || '',
+          imageUrl: event.imageUrl,
+          immersiveImages: event.immersiveImages || {
+            backgroundUrl: '',
+            artistUrl: '',
+            dateUrl: '',
+            zoneMapUrl: '',
+          },
           startDateTime: new Date(event.startDateTime),
           endDateTime: new Date(event.endDateTime),
+          categoryId: event.category?._id || '',
+          url: event.url || '',
+          layoutType: event.layoutType,
+          pricingPhases: event.pricingPhases || [],
         }
       : eventDefaultValues;
   const router = useRouter();
