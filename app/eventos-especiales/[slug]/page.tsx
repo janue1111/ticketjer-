@@ -2,14 +2,12 @@ import ImmersiveEventPage from '@/components/shared/ImmersiveEventPage';
 import { getEventBySlug } from '@/lib/actions/event.actions';
 
 type EventDetailsProps = {
-    params: {
-        slug: string;
-    };
+    params: Promise<{ slug: string }>
 };
 
 const EventDetails = async ({ params }: EventDetailsProps) => {
-    // We will create getEventBySlug in the next step
-    const event = await getEventBySlug(params.slug);
+    const resolvedParams = (await params) ?? { slug: '' };
+    const event = await getEventBySlug(resolvedParams.slug);
 
     return (
         <ImmersiveEventPage event={event} />
