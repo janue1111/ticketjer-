@@ -1,3 +1,6 @@
+import type * as z from 'zod'
+import { eventFormSchema } from '@/lib/validator'
+
 export const headerLinks = [
     {
       label: 'Inicio',
@@ -13,7 +16,7 @@ export const headerLinks = [
     },
   ]
   
-  export const eventDefaultValues = {
+  export const eventDefaultValues: z.infer<typeof eventFormSchema> = {
     title: '',
      slug: '',
     description: '',

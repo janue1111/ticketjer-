@@ -129,25 +129,21 @@ const TierFields = ({ nestIndex, control }: { nestIndex: number; control: Contro
 const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
   const initialValues: z.infer<typeof eventFormSchema> =
-    event && type === "Update"
+    type === "Update" && event
       ? {
-          title: event.title,
-          slug: event.slug || '',
-          description: event.description || '',
-          location: event.location || '',
-          imageUrl: event.imageUrl,
-          immersiveImages: event.immersiveImages || {
-            backgroundUrl: '',
-            artistUrl: '',
-            dateUrl: '',
-            zoneMapUrl: '',
-          },
-          startDateTime: new Date(event.startDateTime),
-          endDateTime: new Date(event.endDateTime),
-          categoryId: event.category?._id || '',
-          url: event.url || '',
-          layoutType: event.layoutType,
-          pricingPhases: event.pricingPhases || [],
+          ...eventDefaultValues,
+          title: event.title ?? eventDefaultValues.title,
+          slug: event.slug ?? eventDefaultValues.slug,
+          description: event.description ?? eventDefaultValues.description,
+          location: event.location ?? eventDefaultValues.location,
+          imageUrl: event.imageUrl ?? eventDefaultValues.imageUrl,
+          immersiveImages: event.immersiveImages ?? eventDefaultValues.immersiveImages,
+          startDateTime: new Date(event.startDateTime ?? eventDefaultValues.startDateTime),
+          endDateTime: new Date(event.endDateTime ?? eventDefaultValues.endDateTime),
+          categoryId: event.category?._id ?? eventDefaultValues.categoryId,
+          url: event.url ?? eventDefaultValues.url,
+          layoutType: event.layoutType ?? eventDefaultValues.layoutType,
+          pricingPhases: event.pricingPhases ?? eventDefaultValues.pricingPhases,
         }
       : eventDefaultValues;
   const router = useRouter();
