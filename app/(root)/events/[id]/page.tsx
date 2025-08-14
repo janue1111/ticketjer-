@@ -6,13 +6,16 @@ import { SearchParamProps } from "@/types";
 import { Check } from "lucide-react";
 import Image from "next/image";
 
-const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) => {
+const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
+  const resolvedParams = (await params) ?? { id: "" };
+  const resolvedSearchParams = (await searchParams) ?? {};
+  const { id } = resolvedParams;
   const event = await getEventById(id);
 
   const relatedEvents = await getRelatedEventsByCategory({
     categoryId: event.category._id,
     eventId: event._id,
-    page: searchParams.page as string,
+    page: resolvedSearchParams.page as string,
   })
 
   // console.log(event);
@@ -92,7 +95,7 @@ const EventDetails = async ({ params: { id }, searchParams }: SearchParamProps) 
     emptyStateSubtext="¡Vuelve pronto para más eventos!"
     collectionType="All_Events"
     limit={3}
-    page={searchParams.page as string}
+    page={resolvedSearchParams.page as string}
     totalPages={relatedEvents?.totalPages}
     />
 
