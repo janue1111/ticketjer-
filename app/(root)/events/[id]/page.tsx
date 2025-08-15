@@ -18,7 +18,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
     page: resolvedSearchParams.page as string,
   });
 
-  const activePhase = event.pricingPhases?.find((phase) => phase.active);
+  const activePhase = event.pricingPhases?.find((phase: IEvent['pricingPhases'][number]) => phase.active);
   const prices = activePhase?.tiers?.map((tier) => Number(tier.price)).filter((p) => !Number.isNaN(p)) || [];
   const lowestPrice: number | null = prices.length > 0 ? Math.min(...prices) : null;
 
