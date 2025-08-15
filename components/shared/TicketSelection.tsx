@@ -38,8 +38,38 @@ const TicketSelection = ({ event }: TicketSelectionProps) => {
     )
   }
 
+  const handleBeginCheckout = () => {
+    if (!selectedTier) return;
+
+    const unitPrice = Number(selectedTier.price) || 0;
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'begin_checkout',
+      currency: 'PEN',
+      value: unitPrice, // Quantity is 1
+      items: [
+        {
+          item_id: event._id,
+          item_name: event.title,
+          item_category: event.category?.name,
+          item_variant: selectedTier.name, // Add tier name as variant
+          price: unitPrice,
+          quantity: 1,
+          ...(event.layoutType === 'immersive' && event.immersiveImages ? {
+            backgroundUrl: event.immersiveImages.backgroundUrl,
+            artistUrl: event.immersiveImages.artistUrl,
+            dateUrl: event.immersiveImages.dateUrl,
+            zoneMapUrl: event.immersiveImages.zoneMapUrl,
+          } : {}),
+        },
+      ],
+    });
+  };
+
   const onCheckout = async () => {
     if (!selectedTier) return
+
+    handleBeginCheckout();
 
     // Obtenemos el userId mapeado a nuestra BD desde Clerk
     const buyerId = (user?.publicMetadata as any)?.userId as string | undefined

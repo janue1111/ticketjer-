@@ -74,7 +74,7 @@ const TierFields = ({ nestIndex, control }: { nestIndex: number; control: Contro
               <FormItem className="w-full">
                 <FormLabel>Precio</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="100.00" {...field} value={field.value || '0'} className="input-field" />
+sd                  <Input type="number" placeholder="100.00" {...field} value={field.value || '0'} className="input-field" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
