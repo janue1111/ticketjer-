@@ -74,7 +74,7 @@ const TierFields = ({ nestIndex, control }: { nestIndex: number; control: Contro
               <FormItem className="w-full">
                 <FormLabel>Precio</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="100.00" {...field} className="input-field" />
+                  <Input type="number" placeholder="100.00" {...field} value={field.value || '0'} className="input-field" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -121,7 +121,7 @@ const TierFields = ({ nestIndex, control }: { nestIndex: number; control: Contro
           />
         </div>
       ))}
-      <Button type="button" onClick={() => append({ name: 'Nuevo Tier', price: '', originalPrice: '', description: '', color: '' })} size="sm" className="mt-2">Añadir Tier</Button>
+      <Button type="button" onClick={() => append({ name: 'Nuevo Tier', price: '0', originalPrice: '', description: '', color: '' })} size="sm" className="mt-2">Añadir Tier</Button>
     </div>
   );
 };
@@ -341,7 +341,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    value={field.value}
                   >
                     <SelectTrigger className="select-field">
                       <SelectValue placeholder="Layout" />

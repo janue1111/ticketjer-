@@ -41,7 +41,7 @@ export const headerLinks = [
         tiers: [
           {
             name: 'ENTRADA GENERAL',
-            price: '',
+            price: '0',
             originalPrice: '',
             description: '',
             color: 'bg-blue-500'

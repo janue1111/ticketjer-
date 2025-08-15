@@ -46,6 +46,12 @@ const Checkout = ({ event, userId }: { event: IEvent; userId: string }) => {
           item_category: event.category?.name,
           price: unitPrice,
           quantity: quantity,
+          ...(event.layoutType === 'immersive' && event.immersiveImages ? {
+            backgroundUrl: event.immersiveImages.backgroundUrl,
+            artistUrl: event.immersiveImages.artistUrl,
+            dateUrl: event.immersiveImages.dateUrl,
+            zoneMapUrl: event.immersiveImages.zoneMapUrl,
+          } : {}),
         },
       ],
     });

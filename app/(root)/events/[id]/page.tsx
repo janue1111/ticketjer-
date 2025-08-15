@@ -16,7 +16,11 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
     categoryId: event.category._id,
     eventId: event._id,
     page: resolvedSearchParams.page as string,
-  })
+  });
+
+  const activePhase = event.pricingPhases?.find((phase) => phase.active);
+  const prices = activePhase?.tiers?.map((tier) => Number(tier.price)).filter((p) => !Number.isNaN(p)) || [];
+  const lowestPrice: number | null = prices.length > 0 ? Math.min(...prices) : null;
 
   // console.log(event);
   return (
@@ -38,7 +42,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="flex gap-3">
               <p className="p-bold-20 rounded-full bg-green-500/10 px-5 py-2 text-green-700">
-                {event.isFree ? 'GRATIS' : `${event.price}`}
+                {event.isFree ? 'GRATIS' : `S/ ${lowestPrice}`}
               </p>
               <p className="p-medium-16 rounded-full bg-grey-500/10 px-4 py-2.5 text-grey-500">
                 {event.category.name}
