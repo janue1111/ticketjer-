@@ -1,6 +1,7 @@
 import CheckoutButton from "@/components/shared/CheckoutButton";
 import Collection from "@/components/shared/Collection";
 import { getEventById, getRelatedEventsByCategory } from "@/lib/actions/event.actions";
+import { IEvent } from "@/lib/database/models/event.model";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
 import { Check } from "lucide-react";
