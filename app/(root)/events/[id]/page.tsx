@@ -20,7 +20,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   });
 
   const activePhase = event.pricingPhases?.find((phase: IEvent['pricingPhases'][number]) => phase.active);
-  const prices = activePhase?.tiers?.map((tier: IEvent['pricingPhases'][number]['tiers'][number]) => Number(tier.price)).filter((p) => !Number.isNaN(p)) || [];
+  const prices = activePhase?.tiers?.map((tier: IEvent['pricingPhases'][number]['tiers'][number]) => Number(tier.price)).filter((p: number) => !Number.isNaN(p)) || [];
   const lowestPrice: number | null = prices.length > 0 ? Math.min(...prices) : null;
 
   // console.log(event);
