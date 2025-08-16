@@ -16,3 +16,17 @@ gemini "Lee el contenido del archivo 'INITIAL.md' y también el contenido de nue
 
 el sigueinte paso una vez ejecute el plan sera decir algo como :
 gemini "Ejecuta el plan de implementación que se encuentra en el archivo 'PRPs/PRP_add_tests.md'. Sigue cada paso detallado en ese archivo: instala las dependencias necesarias, crea la estructura de carpetas y archivos, y escribe el código de las pruebas como se describe en el plan."
+-----------------AAAAAAAAAAAAAAAAAAA
+para cunado se haga algun cambio o se arregle algo, el plan basico es:
+1-La orden de leer su contexto base (gemini.md).
+2-La descripción del problema (el log de error).
+3-La petición de que proponga y aplique una solución.
+ejemplo de como aplica a un caso real:
+1-
+gemini "El deploy en Vercel está fallando , Primero, lee nuestro archivo de reglas 'gemini.md(o claude.md)' para tener el contexto completo del proyecto.** Luego, analiza este log de error y aplica la corrección necesaria este es el logs {aqui pones el logs}
+
+(una vez se mande esto ¿Qué hará Gemini o cursor  ahora? Contextualización: Leerá gemini.md y entenderá las reglas, el estilo, la arquitectura, etc. Análisis del Error, Solución Informada: En lugar de adivinar, usará el contexto para proponer la solución más adecuada , Aplicación: Modificará el archivo necesario)
+ahora lo que se hara es que gemini/cursor documenten lo que realizaron para que en un futuro puedan aprender de como es que se trabaja
+ 
+ se le respondera algo asi: 
+ gemini "Perfecto, la corrección solucionó el error de deploy. Ahora, **actualiza nuestro archivo de reglas 'gemini.md(o claude.md o ambos)' para que este aprendizaje no se pierda.** Bajo la sección '4. Style & Conventions'(o la seccion que corresponda segun el claude.md o gemini.md), añade una nueva subsección llamada '### Reglas de TypeScript'(o la seccion que haya sido solucionada, esto se lo podemos pedir al mismo gemini) y agrega esta regla: (en la regla a agregar se pondra lo que hizo para solucionar y como actuar en situaciones futuras, por ejm: agrega esta regla: '- **Tipado en Mapeos:** Cuando se itera sobre un array que puede contener diferentes tipos de objetos (unión de tipos), siempre se debe especificar el tipo del elemento en el callback del \map` para evitar errores de tipo 'unknown'. Ejemplo: `data.map((item: IOrder | IEvent) => { ... })`.'"`)
