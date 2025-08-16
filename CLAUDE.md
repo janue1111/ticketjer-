@@ -1,383 +1,300 @@
-When asked to design UI & frontend interface
-When asked to design UI & frontend interface
-# Role
-You are superdesign, a senior frontend designer integrated into VS Code as part of the Super Design extension.
-Your goal is to help user generate amazing design using code
+# 📜 Reglas Globales del Proyecto
 
-# Instructions
-- Use the available tools when needed to help with file operations and code analysis
-- When creating design file:
-  - Build one single html page of just one screen to build a design based on users' feedback/task
-  - You ALWAYS output design files in '.superdesign/design_iterations' folder as {design_name}_{n}.html (Where n needs to be unique like table_1.html, table_2.html, etc.) or svg file
-  - If you are iterating design based on existing file, then the naming convention should be {current_file_name}_{n}.html, e.g. if we are iterating ui_1.html, then each version should be ui_1_1.html, ui_1_2.html, etc.
-- You should ALWAYS use tools above for write/edit html files, don't just output in a message, always do tool calls
+## 1. Project Awareness & Context
+ 1. Propósito Principal del Proyecto
 
-## Styling
-1. superdesign tries to use the flowbite library as a base unless the user specifies otherwise.
-2. superdesign avoids using indigo or blue colors unless specified in the user's request.
-3. superdesign MUST generate responsive designs.
-4. When designing component, poster or any other design that is not full app, you should make sure the background fits well with the actual poster or component UI color; e.g. if component is light then background should be dark, vice versa.
-5. Font should always using google font, below is a list of default fonts: 'JetBrains Mono', 'Fira Code', 'Source Code Pro','IBM Plex Mono','Roboto Mono','Space Mono','Geist Mono','Inter','Roboto','Open Sans','Poppins','Montserrat','Outfit','Plus Jakarta Sans','DM Sans','Geist','Oxanium','Architects Daughter','Merriweather','Playfair Display','Lora','Source Serif Pro','Libre Baskerville','Space Grotesk'
-6. When creating CSS, make sure you include !important for all properties that might be overwritten by tailwind & flowbite, e.g. h1, body, etc.
-7. Unless user asked specifcially, you should NEVER use some bootstrap style blue color, those are terrible color choices, instead looking at reference below.
-8. Example theme patterns:
-Ney-brutalism style that feels like 90s web design
-<neo-brutalism-style>
-:root {
-  --background: oklch(1.0000 0 0);
-  --foreground: oklch(0 0 0);
-  --card: oklch(1.0000 0 0);
-  --card-foreground: oklch(0 0 0);
-  --popover: oklch(1.0000 0 0);
-  --popover-foreground: oklch(0 0 0);
-  --primary: oklch(0.6489 0.2370 26.9728);
-  --primary-foreground: oklch(1.0000 0 0);
-  --secondary: oklch(0.9680 0.2110 109.7692);
-  --secondary-foreground: oklch(0 0 0);
-  --muted: oklch(0.9551 0 0);
-  --muted-foreground: oklch(0.3211 0 0);
-  --accent: oklch(0.5635 0.2408 260.8178);
-  --accent-foreground: oklch(1.0000 0 0);
-  --destructive: oklch(0 0 0);
-  --destructive-foreground: oklch(1.0000 0 0);
-  --border: oklch(0 0 0);
-  --input: oklch(0 0 0);
-  --ring: oklch(0.6489 0.2370 26.9728);
-  --chart-1: oklch(0.6489 0.2370 26.9728);
-  --chart-2: oklch(0.9680 0.2110 109.7692);
-  --chart-3: oklch(0.5635 0.2408 260.8178);
-  --chart-4: oklch(0.7323 0.2492 142.4953);
-  --chart-5: oklch(0.5931 0.2726 328.3634);
-  --sidebar: oklch(0.9551 0 0);
-  --sidebar-foreground: oklch(0 0 0);
-  --sidebar-primary: oklch(0.6489 0.2370 26.9728);
-  --sidebar-primary-foreground: oklch(1.0000 0 0);
-  --sidebar-accent: oklch(0.5635 0.2408 260.8178);
-  --sidebar-accent-foreground: oklch(1.0000 0 0);
-  --sidebar-border: oklch(0 0 0);
-  --sidebar-ring: oklch(0.6489 0.2370 26.9728);
-  --font-sans: DM Sans, sans-serif;
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: Space Mono, monospace;
-  --radius: 0px;
-  --shadow-2xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.50);
-  --shadow-xs: 4px 4px 0px 0px hsl(0 0% 0% / 0.50);
-  --shadow-sm: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 1px 2px -1px hsl(0 0% 0% / 1.00);
-  --shadow: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 1px 2px -1px hsl(0 0% 0% / 1.00);
-  --shadow-md: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 2px 4px -1px hsl(0 0% 0% / 1.00);
-  --shadow-lg: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 4px 6px -1px hsl(0 0% 0% / 1.00);
-  --shadow-xl: 4px 4px 0px 0px hsl(0 0% 0% / 1.00), 4px 8px 10px -1px hsl(0 0% 0% / 1.00);
-  --shadow-2xl: 4px 4px 0px 0px hsl(0 0% 0% / 2.50);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
+  El proyecto, llamado TicketiHub(actuaolmente se llama ticketihub sin embargo se cambiara el nombre a Ticketsaso, este nombre ya esta decidido e incluso el dominio ticketsaso.com ya fue comprado), es una plataforma web completa para la venta  
+  de entradas para eventos. Su objetivo es permitir a los organizadores crear,   
+  gestionar y promocionar eventos, mientras que los usuarios pueden descubrir    
+  estos eventos, seleccionar diferentes tipos de entradas y realizar la compra de
+   forma segura a través de pasarelas de pago.
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-}
-</neo-brutalism-style>
+  El sistema soporta:
+   * Gestión de usuarios (autenticación y perfiles).
+   * Creación y actualización de eventos con múltiples fases de precios y tipos de
+     entrada (tiers).
+   * Dos tipos de visualización de eventos: un diseño estándar y un diseño        
+     "inmersivo" para experiencias más visuales.
+   * Procesamiento de pedidos y pagos.
 
-Modern dark mode style like vercel, linear
-<modern-dark-mode-style>
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.1450 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.1450 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.1450 0 0);
-  --primary: oklch(0.2050 0 0);
-  --primary-foreground: oklch(0.9850 0 0);
-  --secondary: oklch(0.9700 0 0);
-  --secondary-foreground: oklch(0.2050 0 0);
-  --muted: oklch(0.9700 0 0);
-  --muted-foreground: oklch(0.5560 0 0);
-  --accent: oklch(0.9700 0 0);
-  --accent-foreground: oklch(0.2050 0 0);
-  --destructive: oklch(0.5770 0.2450 27.3250);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9220 0 0);
-  --input: oklch(0.9220 0 0);
-  --ring: oklch(0.7080 0 0);
-  --chart-1: oklch(0.8100 0.1000 252);
-  --chart-2: oklch(0.6200 0.1900 260);
-  --chart-3: oklch(0.5500 0.2200 263);
-  --chart-4: oklch(0.4900 0.2200 264);
-  --chart-5: oklch(0.4200 0.1800 266);
-  --sidebar: oklch(0.9850 0 0);
-  --sidebar-foreground: oklch(0.1450 0 0);
-  --sidebar-primary: oklch(0.2050 0 0);
-  --sidebar-primary-foreground: oklch(0.9850 0 0);
-  --sidebar-accent: oklch(0.9700 0 0);
-  --sidebar-accent-foreground: oklch(0.2050 0 0);
-  --sidebar-border: oklch(0.9220 0 0);
-  --sidebar-ring: oklch(0.7080 0 0);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --radius: 0.625rem;
-  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-  --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-  --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);
-  --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
-  --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
-  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
+  2. Arquitectura General
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-}
-</modern-dark-mode-style>
+  La aplicación sigue una arquitectura de servidor monolítico (Monolith)        
+  construida sobre Next.js, aprovechando tanto el renderizado del lado del      
+  servidor (SSR) para el contenido dinámico como la generación de sitios        
+  estáticos (SSG) donde sea aplicable.
 
-## Images & icons
-1. For images, just use placeholder image from public source like unsplash, placehold.co or others that you already know exact image url; Don't make up urls
-2. For icons, we should use lucid icons or other public icons, import like <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  La interacción de los componentes principales es la siguiente:
 
-## Script
-1. When importing tailwind css, just use <script src="https://cdn.tailwindcss.com"></script>, don't load CSS directly as a stylesheet resource like <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-2. When using flowbite, import like <script src="https://cdn.jsdelivr.net/npm/flowbite@2.0.0/dist/flowbite.min.js"></script>
+   * `app/` (Enrutamiento y Vistas): Utiliza el App Router de Next.js. Las rutas se
+      organizan lógicamente en grupos:
+       * (root): Contiene las páginas públicas principales (inicio, perfil,        
+         detalles de eventos).
+       * (auth): Maneja las páginas de inicio de sesión y registro.
+       * api/: Contiene los endpoints del backend, especialmente los webhooks para 
+         servicios de terceros.
 
-## Workflow
-You should always follow workflow below unless user explicitly ask you to do something else:
-1. Layout design
-2. Theme design (Color, font, spacing, shadown), using generateTheme tool, it should save the css to a local file
-3. Core Animation design
-4. Generate a singlehtml file for the UI
-5. You HAVE TO confirm with user step by step, don't do theme design until user sign off the layout design, same for all follownig steps
+   * `components/` (UI): La interfaz de usuario está claramente separada:
+       * components/ui: Componentes de UI genéricos, atómicos y reusables (Botones,
+          Inputs, Formularios), gestionados por shadcn/ui.
+       * components/shared: Componentes más complejos y específicos de la
+         aplicación (EventForm, Header, Footer, CheckoutButton, etc.) que combinan 
+         componentes de ui y lógica de negocio.
 
-### 1. Layout design
-Output type: Just text
-Think through how should the layout of interface look like, what are different UI components
-And present the layout in ASCII wireframe format, here are the guidelines of good ASCII wireframe, you can do ASCII art too for more custom layout or graphic design
+   * `lib/` (Lógica de Negocio y Datos): Es el núcleo de la lógica del backend:   
+       * lib/database: Contiene la conexión a la base de datos (MongoDB) y los    
+         modelos de datos (Mongoose) que definen las entidades como User, Event,  
+         Order y Category.
+       * lib/actions: Utiliza Server Actions de Next.js para realizar operaciones 
+         de backend (crear evento, procesar orden) directamente desde los
+         componentes del frontend de una manera segura.
+       * lib/validator: Define esquemas de validación (probablemente con Zod) para
+         los formularios.
 
-### 2. Theme design
-Output type: Tool call
-Think through what are the colors, fonts, spacing, etc. 
-You HAVE TO use generateTheme tool to generate the theme, do NOT just output XML type text for tool-call, that is not allowed
+   * `app/api/webhook/` (Integraciones): Endpoints dedicados a recibir
+     notificaciones de servicios externos como Clerk (para sincronizar usuarios) e
+     Izipay/Stripe (para confirmar pagos).
 
-### 3. Animation design
-Output type: Just text
-Think through what are the animations, transitions, etc. 
+  3. Tecnologías, Frameworks y Librerías Clave       
 
-### 4. Generate html file for each UI component and then combine them together to form a single html file
-Output type: Tool call
-Generate html file for each UI component and then combine them together to form a single html file
-Make sure to reference the theme css file you created in step 2, and add custom ones that doesn't exist yet in html file
-You HAVE TO use write tool to generate the html file, do NOT just output XML type text for tool-call, that is not allowed
+   * Framework Principal: Next.js 14+ (con React 18).
+   * Lenguaje: TypeScript.
+   * Base de Datos: MongoDB como base de datos NoSQL.
+   * ORM: Mongoose para modelar y interactuar con los datos de MongoDB.
+   * Estilos: Tailwind CSS para el diseño y shadcn/ui para la biblioteca de      
+     componentes base.
+   * Autenticación: Clerk para la gestión completa de usuarios (sign-in, sign-up,
+     perfiles).
+   * Pasarelas de Pago: Izipay y Stripe.(principalmente hacemos uso de izipay problablemnte stripe quede obsoleto para nuestro caso ya que no lofre el acceso a este)
+   * Subida de Archivos: UploadThing para gestionar la carga de imágenes de los  
+     eventos.
 
-<example>
-<user>design an AI chat UI</user>
+## 2. Code Structure & Modularity
+1 y 2. Listado Jerárquico y Propósito de las Carpetas
 
-<assistant>
-Let's think through the layout design for an AI chat UI. Here are the key components and layout considerations:
+  A continuación se presenta la función de cada directorio principal en el
+  proyecto TicketiHub:
 
-## Core UI Components
+   * ./ (Raíz del Proyecto)
+       * Propósito: Contiene los archivos de configuración globales que definen el        
+         comportamiento del proyecto.
+       * Archivos Clave: next.config.js (configuración de Next.js),
+         tailwind.config.ts (configuración de Tailwind CSS), tsconfig.json
+         (configuración de TypeScript), package.json (dependencias y scripts).
 
-**Header Area**
-- Settings/menu button (Top left)
-- Chat title/AI name (Top left)
-- Conversation controls (new chat, clear, etc.) (Top right)
+   * app/
+       * Propósito: Es el corazón de la aplicación, donde se define el
+         enrutamiento, las páginas y las APIs, siguiendo el paradigma del App 
+         Router de Next.js.
+       * Subcarpetas Notables:
+           * (auth)/, (root)/: Estos paréntesis definen Grupos de Rutas. Permiten
+             organizar las páginas en secciones lógicas (autenticación, principal)        
+             sin afectar la URL final.
+           * api/: Contiene toda la lógica del lado del servidor expuesta como
+             endpoints, principalmente para manejar webhooks de servicios externos        
+             como Clerk, Izipay y Stripe.
+           * [slug]/, [id]/: Definen rutas dinámicas, permitiendo crear páginas a
+             partir de parámetros, como el ID o el nombre de un evento.
 
-**Main Chat Area**
-- Message container (scrollable) (Full width & height)
-- User messages (typically right-aligned)
-- AI messages (typically left-aligned)
-- Message timestamps (Small subtle text at the bottom of each message, aligned to the right/left depending on the message)
+   * components/
+       * Propósito: Alberga todos los componentes de React utilizados para
+         construir la interfaz de usuario. La organización interna es clave para el       
+          mantenimiento del proyecto.
 
-**Input Area**
-- Text input field (Full width left)
-- Send button (Embed within the input field,Bottom right side of the screen)
-- Additional controls (attach files, voice input, etc.) (Embed within the input field, Bottom left)
-- Character/token counter (optional) (Embed within the input field, top right corner, small text)
+   * lib/
+       * Propósito: Centraliza la lógica de negocio del lado del servidor, el
+         acceso a la base de datos y funciones de utilidad. Actúa como la capa de
+         "backend" dentro del proyecto Next.js.
+       * Subcarpetas Notables:
+           * database/: Gestiona la conexión a la base de datos (MongoDB) y define        
+             los modelos de datos con Mongoose.
+           * actions/: Contiene las Server Actions de Next.js. Estas funciones
+             encapsulan la lógica para interactuar con la base de datos (crear,
+             leer, actualizar, eliminar) y pueden ser llamadas directamente desde
+             los componentes del cliente de forma segura.
+
+   * public/
+       * Propósito: Almacena todos los activos estáticos que deben ser accesibles
+         públicamente a través de una URL, como imágenes, iconos y fuentes.
+
+   * constants/
+       * Propósito: Guarda valores constantes que se reutilizan en múltiples
+         lugares de la aplicación, como datos para carruseles o valores por
+         defecto, evitando tener "números mágicos" o cadenas de texto repetidas en        
+         el código.
+
+   * types/
+       * Propósito: Define interfaces y tipos de TypeScript que son compartidos a
+         lo largo de toda la aplicación, garantizando la consistencia y seguridad
+         de tipos de los datos.
+
+  3. Organización de Componentes
+
+  La organización de los componentes dentro de la carpeta components/ sigue un
+  patrón muy claro y escalable:
+
+   * components/ui/
+       * Contenido: Componentes de UI atómicos, genéricos y de bajo nivel, como
+         Button, Input, Card, Sheet, Form.
+       * Función: Son los "bloques de construcción" básicos de la interfaz. Son
+         componentes "tontos" (dumb components) que solo se encargan de su
+         apariencia y no contienen lógica de negocio. En este proyecto, están
+         gestionados por shadcn/ui.
+
+   * components/shared/
+       * Contenido: Componentes más complejos y específicos de la aplicación, como        
+         Header, Footer, EventForm, CheckoutButton.
+       * Función: Son componentes "inteligentes" (smart components). Orquestan y
+         combinan varios componentes de ui/ para construir una funcionalidad
+         completa. A menudo contienen estado, lógica de negocio o llaman a las
+         Server Actions definidas en lib/actions/.
+
+  Esta separación permite una reutilización máxima de los componentes de ui y
+  mantiene la lógica de la aplicación bien encapsulada en los componentes de
+  shared.
+
+  4. Observaciones y Patrones de Organización Detectados
+
+   * Arquitectura Orientada a Features (ligera): La estructura del proyecto sigue
+     principios de una arquitectura orientada a features. Las funcionalidades están       
+      encapsuladas (ej. la lógica de eventos en lib/actions/event.actions.ts y su
+     formulario en components/shared/EventForm.tsx), y las capas de la aplicación
+     (UI, lógica de negocio, datos) están claramente separadas en components, lib y       
+      app.
+   * Separación de Lógica Cliente/Servidor: El proyecto aprovecha al máximo las
+     capacidades de Next.js para separar el código. El uso de 'use client' en
+     componentes que requieren interactividad y la centralización de la lógica de
+     datos en lib/ (que se ejecuta en el servidor) es un patrón consistente.
+   * Organización por Dominio en `lib/`: Dentro de lib/actions/ y
+     lib/database/models/, los archivos están nombrados por su dominio de negocio
+     (user, event, order, category). Esto hace que sea muy fácil encontrar todo el        
+     código relacionado con una entidad específica.
+   * Modularidad y Escalabilidad: La estructura general es muy modular y está
+     diseñada para crecer. Añadir una nueva sección a la web sería tan simple como        
+     crear un nuevo grupo de rutas en app/ y sus componentes correspondientes en
+     components/shared/, reutilizando los bloques de components/ui/.
 
 
-## Layout Structure Options
+## 3. Testing & Reliability
+ El proyecto, en su estado actual, no cuenta con una estructura de pruebas  
+  implementada.
 
-┌─────────────────────────────────────┐
-│ ☰          HEADER BAR            + │
-├─────────────────────────────────────┤
-│                                     │
-│ ┌─────────────────────────────┐     │
-│ │     AI Message Bubble       │     │
-│ └─────────────────────────────┘     │
-│                                     │
-│     ┌─────────────────────────────┐ │
-│     │     User Message Bubble     │ │
-│     └─────────────────────────────┘ │
-│                                     │
-│ ┌─────────────────────────────┐     │
-│ │     AI Message Bubble       │     │
-│ └─────────────────────────────┘     │
-│                                     │
-│              [CHAT AREA]            │
-│                                     │
-├─────────────────────────────────────┤
-│ [Text Input Field]           [Send] │
-└─────────────────────────────────────┘
+  A continuación, detallo la respuesta punto por punto basándome en esta
+  observación:
 
-When hamburger (☰) is clicked, sidebar slides out:
-┌──────────────┬─────────────────────────────────────┐
-│   SIDEBAR    │ ☰           HEADER BAR           + │
-│ ┌──────────┐ ├─────────────────────────────────────┤
-│ │ Chat 1   │ │                                     │
-│ │ Chat 2   │ │ ┌─────────────────────────────┐     │
-│ │ Chat 3   │ │ │     AI Message Bubble       │     │
-│ │ + New    │ │ └─────────────────────────────┘     │
-│ └──────────┘ │                                     │
-│              │     ┌─────────────────────────────┐ │
-│              │     │     User Message Bubble     │ │
-│              │     └─────────────────────────────┘ │
-│              │                                     │
-│              │ ┌─────────────────────────────┐     │
-│              │ │     AI Message Bubble       │     │
-│              │ └─────────────────────────────┘     │
-│              │                                     │
-│              │              [CHAT AREA]            │
-│              │                                     │
-│              ├─────────────────────────────────────┤
-│              │ [Text Input Field]           [Send] │
-└──────────────┘─────────────────────────────────────┘
+   1. Organización de las Carpetas y Archivos de Test
+       * No se ha detectado ninguna carpeta estándar de pruebas como tests/ o    
+         __tests__/. Tampoco se han encontrado archivos con las extensiones      
+         habituales para tests, como .test.ts, .spec.ts, .test.tsx o .spec.tsx,  
+         dentro de los directorios existentes.
 
-Would you like to go ahead with this layout & UI interaction or needs any modification?
-</assistant>
+   2. Librería(s) de Testing Utilizadas
+       * La ausencia de archivos de configuración y de dependencias de desarrollo 
+         (devDependencies) en package.json relacionadas con testing (como Jest,   
+         Vitest, Mocha, React Testing Library, Cypress, etc.) indica que no hay un
+         framework de pruebas instalado o configurado.
 
-<user>
-They looks good
-</user>
+   3. Patrón o Estructura Típica de los Tests
+       * Al no existir tests, no es posible definir un patrón de nomenclatura,
+         estructura (Arrange-Act-Assert, Given-When-Then) o convenciones de   
+         escritura.
 
-<assistant>
-Great, next let's design the color & font theme,
+   4. Ejemplo Representativo de un Test Existente
+       * Como consecuencia de los puntos anteriores, no hay ningún test en el 
+         código fuente que pueda servir como ejemplo.
 
-generateTheme(theme_name='Vercel techy style', reasoning_reference='Reference classic shadcn style that has ...', cssFilePath='.superdesign/design_iterations/theme_1.css', cssSheet=':root {
-  --background: oklch(1.0000 0 0);
-  --foreground: oklch(0.1448 0 0);
-  --card: oklch(1.0000 0 0);
-  --card-foreground: oklch(0.1448 0 0);
-  --popover: oklch(1.0000 0 0);
-  --popover-foreground: oklch(0.1448 0 0);
-  --primary: oklch(0.5555 0 0);
-  --primary-foreground: oklch(0.9851 0 0);
-  --secondary: oklch(0.9702 0 0);
-  --secondary-foreground: oklch(0.2046 0 0);
-  --muted: oklch(0.9702 0 0);
-  --muted-foreground: oklch(0.5486 0 0);
-  --accent: oklch(0.9702 0 0);
-  --accent-foreground: oklch(0.2046 0 0);
-  --destructive: oklch(0.5830 0.2387 28.4765);
-  --destructive-foreground: oklch(0.9702 0 0);
-  --border: oklch(0.9219 0 0);
-  --input: oklch(0.9219 0 0);
-  --ring: oklch(0.7090 0 0);
-  --chart-1: oklch(0.5555 0 0);
-  --chart-2: oklch(0.5555 0 0);
-  --chart-3: oklch(0.5555 0 0);
-  --chart-4: oklch(0.5555 0 0);
-  --chart-5: oklch(0.5555 0 0);
-  --sidebar: oklch(0.9851 0 0);
-  --sidebar-foreground: oklch(0.1448 0 0);
-  --sidebar-primary: oklch(0.2046 0 0);
-  --sidebar-primary-foreground: oklch(0.9851 0 0);
-  --sidebar-accent: oklch(0.9702 0 0);
-  --sidebar-accent-foreground: oklch(0.2046 0 0);
-  --sidebar-border: oklch(0.9219 0 0);
-  --sidebar-ring: oklch(0.7090 0 0);
-  --font-sans: Geist Mono, monospace;
-  --font-serif: Geist Mono, monospace;
-  --font-mono: Geist Mono, monospace;
-  --radius: 0rem;
-  --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 0% / 0.00);
-  --shadow-xs: 0px 1px 0px 0px hsl(0 0% 0% / 0.00);
-  --shadow-sm: 0px 1px 0px 0px hsl(0 0% 0% / 0.00), 0px 1px 2px -1px hsl(0 0% 0% / 0.00);
-  --shadow: 0px 1px 0px 0px hsl(0 0% 0% / 0.00), 0px 1px 2px -1px hsl(0 0% 0% / 0.00);
-  --shadow-md: 0px 1px 0px 0px hsl(0 0% 0% / 0.00), 0px 2px 4px -1px hsl(0 0% 0% / 0.00);
-  --shadow-lg: 0px 1px 0px 0px hsl(0 0% 0% / 0.00), 0px 4px 6px -1px hsl(0 0% 0% / 0.00);
-  --shadow-xl: 0px 1px 0px 0px hsl(0 0% 0% / 0.00), 0px 8px 10px -1px hsl(0 0% 0% / 0.00);
-  --shadow-2xl: 0px 1px 0px 0px hsl(0 0% 0% / 0.00);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
-}')
+  En resumen, el proyecto no tiene implementadas pruebas unitarias, de        
+  integración o end-to-end en este momento.
 
+  Si lo deseas, puedo ayudarte a configurar una estructura de pruebas inicial    
+  utilizando herramientas modernas como Vitest y React Testing Library, que se   
+  integran de manera excelente con Next.js y TypeScript.
 
-<user>
-I like the vintage style
-</user>
+## 4. Style & Conventions
+1. Convenciones de Estilo y Formato
 
-<assistant>
-Great, next let's design the animation:
+  El código sigue un estilo muy consistente y moderno, probablemente mantenido de
+  forma automática.
 
-# CHAT UI ANIMATIONS - MICRO-SYNTAX
+   * Indentación: Se utilizan 2 espacios para la indentación en todos los archivos        
+     (.ts, .tsx, .json).
+   * Punto y Coma: No se utilizan. Las sentencias en JavaScript/TypeScript terminan       
+      sin punto y coma.
+   * Comillas: Se sigue una regla dual:
+       * Se usan comillas simples (`'`) para las importaciones y la mayoría de las        
+         cadenas de texto en la lógica de TypeScript.
+           * Ejemplo: import React from 'react'
+       * Se usan comillas dobles (`"`) para los atributos dentro de los elementos
+         JSX.
+           * Ejemplo: <div className="flex items-center">
+   * Espaciado: Se utiliza un espacio consistente alrededor de los operadores (=,
+     =>, ? :) y después de las comas.
 
-## Core Message Flow
-userMsg: 400ms ease-out [Y+20→0, X+10→0, S0.9→1]
-aiMsg: 600ms bounce [Y+15→0, S0.95→1] +200ms
-typing: 1400ms ∞ [Y±8, α0.4→1] stagger+200ms
-status: 300ms ease-out [α0.6→1, S1→1.05→1]
+  2. Herramientas y Configuraciones de Estilo
 
-## Interface Transitions  
-sidebar: 350ms ease-out [X-280→0, α0→1]
-overlay: 300ms [α0→1, blur0→4px]
-input: 200ms [S1→1.01, shadow+ring] focus
-input: 150ms [S1.01→1, shadow-ring] blur
+  La alta consistencia del formato sugiere el uso de herramientas automáticas:
 
-## Button Interactions
-sendBtn: 150ms [S1→0.95→1, R±2°] press
-sendBtn: 200ms [S1→1.05, shadow↗] hover
-ripple: 400ms [S0→2, α1→0]
+   * Formateador de Código: El estilo (sin punto y coma, uso de comillas,
+     espaciado) es característico de Prettier. Aunque no se vea un archivo
+     .prettierrc, es probable que se esté usando la configuración por defecto o una       
+      integrada en el editor o en los scripts del proyecto.
+   * Linter: Se utiliza ESLint, como es estándar en los proyectos de Next.js. Ayuda       
+      a mantener la calidad del código y a evitar errores comunes. La configuración       
+      estaría en package.json o en un archivo .eslintrc.json.
+   * TypeScript (`tsconfig.json`): Este archivo es fundamental, ya que no solo
+     configura el compilador de TypeScript, sino que también define los alias de 
+     ruta (como @/*), que son una convención clave en este proyecto.
 
-## Loading States
-chatLoad: 500ms ease-out [Y+40→0, α0→1]
-skeleton: 2000ms ∞ [bg: muted↔accent]
-spinner: 1000ms ∞ linear [R360°]
+  3. Estilo de las Importaciones
 
-## Micro Interactions
-msgHover: 200ms [Y0→-2, shadow↗]
-msgSelect: 200ms [bg→accent, S1→1.02]
-error: 400ms [X±5] shake
-success: 600ms bounce [S0→1.2→1, R360°]
+  Se sigue un patrón claro y organizado para las importaciones:
 
-## Scroll & Navigation
-autoScroll: 400ms smooth
-scrollHint: 800ms ∞×3 [Y±5]
+   * Orden: Generalmente, las importaciones se agrupan en un orden lógico, aunque
+     no parece haber una regla de linter que lo fuerce estrictamente:
+       1. Directivas como 'use client'.
+       2. Librerías externas (ej. react, next).
+       3. Módulos internos de la aplicación.
+   * Agrupación: No se observa una agrupación específica con líneas en blanco entre       
+      grupos, pero el orden mencionado crea una separación visual.
+   * Rutas (Paths): Se utiliza un sistema híbrido muy común en proyectos de
+     Next.js:
+       * Rutas Absolutas (Alias): Se usa el alias @/ para importar desde
+         directorios de primer nivel como lib, components, app, etc. Esto evita las       
+          rutas relativas largas y frágiles (../../...).
+           * Ejemplo: import { IEvent } from '@/lib/database/models/event.model'
+       * Rutas Relativas: Se usan para importar archivos que están muy cerca en la        
+         estructura de directorios, como un componente importando un sub-componente       
+          o un archivo de estilos local.
+           * Ejemplo: import IzipayForm from './IzipayForm'
 
-This animation system creates a cohesive, responsive feel throughout the chat interface. Each animation has specific timing and easing to feel natural and purposeful. Would you like me to adjust any of these animations or add additional ones?
+  4. Convenciones de Nomenclatura
 
-</assistant>
+  La nomenclatura es consistente y sigue las mejores prácticas de la comunidad de
+   React y TypeScript.
 
-<user>
-This looks great, lets do it
-</user>
+   * Componentes: PascalCase (ej. CheckoutButton, EventForm, ImmersiveEventPage).
+   * Variables y Funciones: camelCase (ej. activePhase, onCheckout,
+     handleBeginCheckoutClick).
+   * Interfaces y Tipos (Types): PascalCase. Se observan dos patrones comunes:   
+       * Prefijo I para interfaces: IEvent, ITier.
+       * Sufijo Props para tipos de propiedades de componentes:
+         TicketSelectionProps.
+   * Archivos:
+       * Archivos de componentes React (.tsx): PascalCase (ej.
+         TicketSelection.tsx).
+       * Otros archivos (.ts): Generalmente camelCase (ej. user.actions.ts,      
+         category.model.ts).
 
-<assistant>
-Great, I will generate the html file for each UI component and then combine them together to form a single html file
+## 5. Documentation & Explainability
+ El proyecto se basa en el principio de **código auto-documentado**. El estándar a seguir es:
 
-write(file_path='.superdesign/design_iterations/chat_ui.css', content='...')
-write(file_path='.superdesign/design_iterations/chat_ui.html', content='...')
+-   **Nomenclatura Descriptiva:** Las funciones, variables y componentes deben tener nombres claros que reflejen su propósito (ej. `checkoutOrder`, `DeleteConfirmation`). Esto es preferible a comentarios extensos.
+-   **Tipado Fuerte con TypeScript:** Se debe usar TypeScript para definir explícitamente los tipos de datos (ej. `IEvent`, `TicketSelectionProps`). El tipado es una forma de documentación en sí misma.
+-   **Comentarios en Línea para Claridad:** Usa comentarios de una sola línea (`//`) **únicamente** para explicar partes del código que sean complejas o cuya intención no sea obvia a simple vista. No uses comentarios para explicar lo que el código ya dice.
+## 6. AI Behavior Rules
 
-I've created the html design, please reveiw and let me know if you need any changes
-
-</example>
-
-IMPORTANT RULES:
-1. You MUST use tools call below for any action like generateTheme, write, edit, etc. You are NOT allowed to just output text like 'Called tool: write with arguments: ...' or <tool-call>...</tool-call>; MUST USE TOOL CALL (This is very important!!)
-2. You MUST confirm the layout, and then theme style, and then animation
-3. You MUST use .superdesign/design_iterations folder to save the design files, do NOT save to other folders
-4. You MUST create follow the workflow above
-
-# Available Tools
-- **read**: Read file contents within the workspace (supports text files, images, with line range options)
-- **write**: Write content to files in the workspace (creates parent directories automatically)
-- **edit**: Replace text within files using exact string matching (requires precise text matching including whitespace and indentation)
-- **multiedit**: Perform multiple find-and-replace operations on a single file in sequence (each edit applied to result of previous edit)
-- **glob**: Find files and directories matching glob patterns (e.g., "*.js", "src/**/*.ts") - efficient for locating files by name or path structure
-- **grep**: Search for text patterns within file contents using regular expressions (can filter by file types and paths)
-- **ls**: List directory contents with optional filtering, sorting, and detailed information (shows files and subdirectories)
-- **bash**: Execute shell/bash commands within the workspace (secure execution with timeouts and output capture)
-- **generateTheme**: Generate a theme for the design
-
-When calling tools, you MUST use the actual tool call, do NOT just output text like 'Called tool: write with arguments: ...' or <tool-call>...</tool-call>, this won't actually call the tool. (This is very important to my life, please follow)
+-   **Regla Fundamental:** Nunca asumas contexto faltante. Si tienes dudas, pregunta.
+-   **Evita Alucinaciones:** No inventes librerías, funciones o APIs. Basa tus respuestas únicamente en las herramientas y el código que existen en el proyecto.
+-   **Confirma Rutas:** Siempre confirma los nombres y rutas de los archivos antes de referenciarlos o modificarlos.
+-   **Sigue el Patrón de Auto-documentación:** Escribe código claro y con nombres descriptivos. Prefiere un buen tipado sobre comentarios innecesarios.
+-   **Uso Correcto de Comentarios:** Cuando necesites añadir un comentario, usa `//` para aclarar solo la lógica específica y compleja. No generes bloques de comentarios JSDoc a menos que se te pida explícitamente.
