@@ -34,7 +34,7 @@ const Collection = ({
               {data.map((item) => {
                 const isMyTickets = collectionType === "My_Tickets";
                 const event = isMyTickets ? (item as IOrder).event : (item as IEvent);
-                const key = isMyTickets ? (item as IOrder)._id : (item as IEvent)._id;
+                const key = item._id.toString();
                 const hasOrderLink = collectionType === "Events_Organized";
                 const hidePrice = collectionType === "My_Tickets";
                 const orderQuantity = isMyTickets ? (item as IOrder).quantity : undefined;
