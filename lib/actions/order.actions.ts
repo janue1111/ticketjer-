@@ -90,16 +90,33 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
   };
 
   // --- Creación de la cadena para firmar ---
-  const string_params = Object.fromEntries(
-    Object.entries(vads_params).map(([key, value]) => [key, String(value)])
-  );
+  // Lista explícita y ordenada de los campos requeridos por Izipay para la firma.
+  const signature_fields = [
+    'vads_action_mode',
+    'vads_amount',
+    'vads_ctx_mode',
+    'vads_currency',
+    'vads_cust_email',
+    'vads_cust_id',
+    'vads_order_id',
+    'vads_page_action',
+    'vads_payment_config',
+    'vads_site_id',
+    'vads_trans_date',
+    'vads_trans_id',
+    'vads_version'
+  ];
 
-  const sorted_keys = Object.keys(string_params)
-    .filter(key => key.startsWith('vads_'))
-    .sort();
-
-  const string_to_sign = sorted_keys
-    .map(key => string_params[key])
+  // Se recogen los valores de vads_params en el orden estricto de la lista anterior.
+  const string_to_sign = signature_fields
+    .map(key => {
+      const value = vads_params[key];
+      if (value === undefined || value === null) {
+        // Esto nos alertaría si un campo esperado no estuviera presente.
+        throw new Error(`El campo requerido para la firma '${key}' no fue encontrado en vads_params.`);
+      }
+      return String(value);
+    })
     .join('+');
 
   // --- Cálculo de la firma (Método HMAC) ---
