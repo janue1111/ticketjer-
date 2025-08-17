@@ -26,26 +26,25 @@ export async function POST(req: Request) {
   }
 
   const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
+  // DEBUG: Verificar la longitud de la clave secreta
+  console.log('Longitud de clave leída:', secretKey.length);
 
   // --- LÓGICA DE FIRMA DEFINITIVA ---
 
-  // 1. Filtrar campos: Incluir solo los que empiezan con `vads_`, excluir `vads_hash` y aquellos con valor vacío.
   const vadsKeys = Object.keys(params)
     .filter(key => key.startsWith('vads_') && key !== 'vads_hash' && params[key] !== undefined && params[key] !== null && params[key] !== '')
     .sort();
 
-  // 2. Crear la cadena de valores para firmar.
   const string_to_sign = vadsKeys
     .map(key => params[key])
     .join('+');
 
-  // 3. Añadir la clave secreta al final de la cadena.
   const data_to_hash = string_to_sign + '+' + secretKey;
 
-  // 4. Calcular la firma.
+  // DEBUG: Forzar encoding utf8
   const local_signature = crypto
     .createHmac('sha256', secretKey)
-    .update(data_to_hash)
+    .update(data_to_hash, 'utf8')
     .digest('base64');
 
   // --- FIN LÓGICA DE FIRMA ---
