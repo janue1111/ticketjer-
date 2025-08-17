@@ -9,6 +9,8 @@ export async function POST(req: Request) {
   const formData = await req.formData();
   const params: { [key: string]: any } = {};
   formData.forEach((value, key) => {
+    // El webhook de Izipay a veces envía los datos dentro de `kr-answer` y a veces como campos planos.
+    // Este código maneja ambos casos para asegurar que todos los parámetros `vads_` se procesen.
     if (key === 'kr-answer') {
       const izipayData = JSON.parse(value.toString());
       for (const vads_key in izipayData) {
@@ -27,97 +29,36 @@ export async function POST(req: Request) {
 
   const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
 
-  // Lista definitiva y ordenada de campos para la firma del webhook de Izipay.
-  const signature_fields = [
-    'vads_action_mode',
-    'vads_acquirer_network',
-    'vads_amount',
-    'vads_archival_reference_id',
-    'vads_auth_mode',
-    'vads_auth_number',
-    'vads_auth_result',
-    'vads_bank_label',
-    'vads_bank_product',
-    'vads_capture_delay',
-    'vads_card_brand',
-    'vads_card_country',
-    'vads_card_nature',
-    'vads_card_number',
-    'vads_card_product_category',
-    'vads_cardholder_card_expiry_month',
-    'vads_cardholder_card_expiry_year',
-    'vads_cardholder_card_number',
-    'vads_contract_used',
-    'vads_ctx_mode',
-    'vads_currency',
-    'vads_cust_email',
-    'vads_cust_id',
-    'vads_effective_amount',
-    'vads_effective_creation_date',
-    'vads_effective_currency',
-    'vads_expiry_month',
-    'vads_expiry_year',
-    'vads_ext_trans_id',
-    'vads_extra_result',
-    'vads_hash',
-    'vads_language',
-    'vads_occurrence_type',
-    'vads_operation_type',
-    'vads_order_id',
-    'vads_page_action',
-    'vads_pays_ip',
-    'vads_payment_certificate',
-    'vads_payment_config',
-    'vads_payment_option_code',
-    'vads_payment_src',
-    'vads_presentation_date',
-    'vads_result',
-    'vads_risk_analysis_result',
-    'vads_sequence_number',
-    'vads_site_id',
-    'vads_threeds_auth_type',
-    'vads_threeds_cavv',
-    'vads_threeds_cavvAlgorithm',
-    'vads_threeds_eci',
-    'vads_threeds_enrolled',
-    'vads_threeds_error_code',
-    'vads_threeds_exit_status',
-    'vads_threeds_sign_valid',
-    'vads_threeds_status',
-    'vads_threeds_user_interaction',
-    'vads_threeds_xid',
-    'vads_trans_date',
-    'vads_trans_id',
-    'vads_trans_status',
-    'vads_trans_uuid',
-    'vads_url_check_src',
-    'vads_validation_mode',
-    'vads_version',
-    'vads_warranty_result'
-  ];
+  // --- INICIO DE LA LÓGICA DE FIRMA DINÁMICA ---
 
-  const string_to_sign = signature_fields
-    .map(key => {
-      const value = params[key];
-      if (value === undefined || value === null) {
-        console.error(`Error de firma: El campo requerido '${key}' no fue encontrado en el webhook.`);
-        throw new Error(`Campo requerido para la firma ausente: ${key}`);
-      }
-      return String(value);
-    })
+  // 1. Filtrar todos los campos `vads_` recibidos, excluyendo `vads_hash` que no forma parte de la firma.
+  const vadsKeys = Object.keys(params)
+    .filter(key => key.startsWith('vads_') && key !== 'vads_hash');
+
+  // 2. Ordenar las claves alfabéticamente, como lo requiere Izipay.
+  vadsKeys.sort();
+
+  // 3. Crear la cadena de valores concatenados con '+' en el orden alfabético.
+  const string_to_sign = vadsKeys
+    .map(key => params[key])
     .join('+');
 
+  // 4. Añadir la clave secreta al final, también separada por '+', según la documentación de Izipay.
   const data_to_hash = string_to_sign + '+' + secretKey;
 
+  // 5. Calcular la firma local usando HMAC-SHA-256 y codificarla en Base64.
   const local_signature = crypto
     .createHmac('sha256', secretKey)
     .update(data_to_hash)
     .digest('base64');
 
+  // --- FIN DE LA LÓGICA DE FIRMA ---
+
   if (receivedSignature !== local_signature) {
     console.error('FIRMA INVÁLIDA. La verificación del webhook ha fallado.');
     console.log("Firma Recibida:", receivedSignature);
     console.log("Firma Calculada:", local_signature);
+    console.log("Cadena usada para calcular (sin la clave secreta):", string_to_sign);
     return NextResponse.json({ message: 'Firma inválida' }, { status: 400 });
   }
 
