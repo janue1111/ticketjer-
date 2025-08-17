@@ -121,10 +121,11 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
 
   // --- Cálculo de la firma (Método HMAC) ---
   const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
+  const data_to_hash = string_to_sign + '+' + secretKey;
 
   const signature = crypto
     .createHmac('sha256', secretKey)
-    .update(string_to_sign)
+    .update(data_to_hash)
     .digest('base64');
 
   vads_params['signature'] = signature;
