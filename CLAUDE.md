@@ -210,6 +210,14 @@
   utilizando herramientas modernas como Vitest y React Testing Library, que se   
   integran de manera excelente con Next.js y TypeScript.
 
+  #### Notas sobre la Configuración del Build y Testing
+
+  Durante los deploys en Vercel, surgieron errores de compilación de TypeScript relacionados con la configuración de Vitest. Las siguientes lecciones fueron aprendidas y aplicadas:
+
+   * **Conflicto de Dependencias:** Las versiones más recientes de `vitest` (>3.x) y `@vitejs/plugin-react` (>5.x) pueden tener conflictos con el compilador de TypeScript usado por `next build`. Se ha establecido que las versiones estables y compatibles para este proyecto son `vitest@^1.6.0` y `@vitejs/plugin-react@^4.3.1`.
+   * **Configuración de `vitest.config.ts`:** El plugin `react()` de Vite no debe ser incluido en la configuración de Vitest, ya que entra en conflicto con el compilador SWC de Next.js. La configuración de alias de TypeScript (`paths`) es suficiente para que Vitest resuelva las rutas del proyecto.
+   * **Tipado Explícito en Modelos de Mongoose:** Al trabajar con tipos de unión (ej. `IEvent | IOrder`), es crucial que todas las interfaces en la unión definan explícitamente las propiedades comunes. Por ejemplo, la propiedad `_id: string;` debe estar presente en todas las interfaces de modelo para evitar que TypeScript la infiera como `unknown`.
+
 ## 4. Style & Conventions
 1. Convenciones de Estilo y Formato
 
