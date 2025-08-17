@@ -19,47 +19,42 @@ export async function POST(req: Request) {
     }
   });
 
-  const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
-
-  // ===============================================================================================
-  // MODO DEBUG DETALLADO (INICIO)
-  // ===============================================================================================
-  console.log('=== DEBUG COMPLETO ===');
-  console.log('TODOS los parámetros recibidos:');
-  Object.keys(params).forEach(key => {
-    console.log(`${key}: ${params[key]}`);
-  });
-  console.log('Primeros 10 caracteres de la clave secreta:', secretKey.substring(0, 10));
-  console.log('Campos vads_ encontrados:', Object.keys(params).filter(k => k.startsWith('vads_')));
-  console.log('=== FIN DEBUG ===');
-  // ===============================================================================================
-
   const receivedSignature = params.signature;
   if (!receivedSignature) {
-    console.error('Error de Webhook: El campo `signature` no fue encontrado en los parámetros.');
+    console.error('Error de Webhook: Firma no encontrada en la respuesta.');
     return NextResponse.json({ message: 'Firma no encontrada.' }, { status: 400 });
   }
 
+  const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
+
+  // --- LÓGICA DE FIRMA DEFINITIVA ---
+
+  // 1. Filtrar campos: Incluir solo los que empiezan con `vads_`, excluir `vads_hash` y aquellos con valor vacío.
   const vadsKeys = Object.keys(params)
-    .filter(key => key.startsWith('vads_') && key !== 'vads_hash');
+    .filter(key => key.startsWith('vads_') && key !== 'vads_hash' && params[key] !== undefined && params[key] !== null && params[key] !== '')
+    .sort();
 
-  vadsKeys.sort();
-
+  // 2. Crear la cadena de valores para firmar.
   const string_to_sign = vadsKeys
     .map(key => params[key])
     .join('+');
 
+  // 3. Añadir la clave secreta al final de la cadena.
   const data_to_hash = string_to_sign + '+' + secretKey;
 
+  // 4. Calcular la firma.
   const local_signature = crypto
     .createHmac('sha256', secretKey)
     .update(data_to_hash)
     .digest('base64');
 
+  // --- FIN LÓGICA DE FIRMA ---
+
   if (receivedSignature !== local_signature) {
     console.error('FIRMA INVÁLIDA. La verificación del webhook ha fallado.');
     console.log("Firma Recibida:", receivedSignature);
     console.log("Firma Calculada:", local_signature);
+    console.log("Cadena usada para calcular (sin la clave secreta):", string_to_sign);
     return NextResponse.json({ message: 'Firma inválida' }, { status: 400 });
   }
 
