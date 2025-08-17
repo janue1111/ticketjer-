@@ -19,21 +19,19 @@ export async function POST(req: Request) {
     }
   });
 
+  const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
+
   // ===============================================================================================
-  // MODO DEBUG DETALLADO
+  // MODO DEBUG DETALLADO (INICIO)
   // ===============================================================================================
-  console.log('\n=== DEBUG COMPLETO ===');
+  console.log('=== DEBUG COMPLETO ===');
   console.log('TODOS los parámetros recibidos:');
-  Object.keys(params).sort().forEach(key => {
+  Object.keys(params).forEach(key => {
     console.log(`${key}: ${params[key]}`);
   });
-  
-  const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
-  if (secretKey) {
-    console.log(`Primeros 10 caracteres de la clave secreta: ${secretKey.substring(0, 10)}...`);
-  } else {
-    console.log('Error: La clave secreta (IZIPAY_TEST_SECRET_KEY) no está definida.');
-  }
+  console.log('Primeros 10 caracteres de la clave secreta:', secretKey.substring(0, 10));
+  console.log('Campos vads_ encontrados:', Object.keys(params).filter(k => k.startsWith('vads_')));
+  console.log('=== FIN DEBUG ===');
   // ===============================================================================================
 
   const receivedSignature = params.signature;
@@ -58,14 +56,10 @@ export async function POST(req: Request) {
     .update(data_to_hash)
     .digest('base64');
 
-  console.log('\n--- Verificación de Firma ---');
-  console.log('Firma Recibida:', receivedSignature);
-  console.log('Firma Calculada:', local_signature);
-  console.log('Cadena usada para calcular (sin la clave secreta):', string_to_sign);
-  console.log('=== FIN DEBUG ===\n');
-
   if (receivedSignature !== local_signature) {
     console.error('FIRMA INVÁLIDA. La verificación del webhook ha fallado.');
+    console.log("Firma Recibida:", receivedSignature);
+    console.log("Firma Calculada:", local_signature);
     return NextResponse.json({ message: 'Firma inválida' }, { status: 400 });
   }
 
@@ -86,7 +80,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'OK', order: createdOrder }, { status: 200 });
 
   } catch (error) {
-    console.error('Error al crear la orden desde el webhook de IziPay:', error);
+    console.error("Error al crear la orden desde el webhook de IziPay:", error);
     return NextResponse.json({ message: 'Error interno del servidor al crear la orden' }, { status: 500 });
   }
 }
