@@ -69,6 +69,18 @@
    * Subida de Archivos: UploadThing para gestionar la carga de imágenes de los  
      eventos.
 
+  **4. Notas sobre Integraciones de APIs Externas (Izipay)**
+
+  La integración con la pasarela de pagos Izipay demostró ser particularmente sensible en la generación de la firma de seguridad. El siguiente aprendizaje es crucial para evitar errores de `PaymentFormError = 00 - signature`:
+
+   * **La Fuente de la Verdad es el Error Detallado:** Los mensajes de error de Izipay que incluyen la "Cadena de caracteres para codificar" son la herramienta de depuración más importante. La firma generada por el servidor debe ser idéntica a la que Izipay espera, carácter por carácter.
+
+   * **Construcción Rigurosa de la Firma HMAC-SHA-256:** El proceso correcto, que debe seguirse de forma estricta, es:
+       1. **Lista Explícita de Campos:** Se debe usar una lista predefinida y ordenada alfabéticamente de todos los campos `vads_` que Izipay espera para la firma. No se debe generar esta lista dinámicamente, para evitar incluir campos no deseados.
+       2. **Concatenación de Valores:** Unir los valores de estos campos (en el orden estricto de la lista) usando el símbolo `+` como separador.
+       3. **Inclusión de la Clave Secreta en la Cadena:** Este es el paso más crítico y menos obvio. La clave secreta (el `certificate` o `IZIPAY_TEST_SECRET_KEY`) debe ser añadida al final de la cadena de valores, también separada por un `+`.
+       4. **Hashing HMAC:** La cadena completa resultante del paso anterior (valores + clave secreta) es el "payload" o "mensaje" que se debe firmar usando el algoritmo `HMAC-SHA-256`. La clave secreta se utiliza una segunda vez como la clave para la función HMAC.
+
 ## 2. Code Structure & Modularity
 1 y 2. Listado Jerárquico y Propósito de las Carpetas
 

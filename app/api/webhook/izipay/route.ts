@@ -25,18 +25,39 @@ export async function POST(req: Request) {
   }
 
   const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
-  const sorted_keys = Object.keys(params)
-    .filter(key => key.startsWith('vads_'))
-    .sort();
 
-  const string_to_sign = sorted_keys
-    .map(key => params[key])
+  // Lista explícita y ordenada de los campos requeridos por Izipay para la firma.
+  const signature_fields = [
+    'vads_action_mode',
+    'vads_amount',
+    'vads_ctx_mode',
+    'vads_currency',
+    'vads_cust_email',
+    'vads_cust_id',
+    'vads_order_id',
+    'vads_page_action',
+    'vads_payment_config',
+    'vads_site_id',
+    'vads_trans_date',
+    'vads_trans_id',
+    'vads_version'
+  ];
+
+  // Se recogen los valores de los parámetros recibidos en el orden estricto de la lista.
+  const string_to_sign = signature_fields
+    .map(key => {
+      const value = params[key];
+      if (value === undefined || value === null) {
+        throw new Error(`El campo requerido para la firma '${key}' no fue encontrado en los parámetros del webhook.`);
+      }
+      return String(value);
+    })
     .join('+');
 
   const data_to_hash = string_to_sign + '+' + secretKey;
 
   const local_signature = crypto
-    .createHash('sha256')
+    .createHmac('sha256', secretKey)
     .update(data_to_hash)
     .digest('base64');
 
