@@ -107,9 +107,11 @@ export async function POST(req: Request) {
     })
     .join('+');
 
+  const data_to_hash = string_to_sign + '+' + secretKey;
+
   const local_signature = crypto
     .createHmac('sha256', secretKey)
-    .update(string_to_sign)
+    .update(data_to_hash)
     .digest('base64');
 
   if (receivedSignature !== local_signature) {
