@@ -65,12 +65,23 @@ export async function POST(req: Request) {
 
     // Tu lógica de negocio
     const orderData = params; 
+
+    // --- INICIO DEL CAMBIO ---
+    // Parsear correctamente la fecha recibida de Izipay
+    const dateString = orderData.vads_presentation_date; // Formato: "AAAAMMDDHHMMSS"
+    
+    // Convertir a un formato que el constructor `new Date()` entienda: "AAAA-MM-DDTHH:MM:SS"
+    const formattedDateString = `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}T${dateString.substring(8, 10)}:${dateString.substring(10, 12)}:${dateString.substring(12, 14)}`;
+    
+    const creationDate = new Date(formattedDateString);
+    // --- FIN DEL CAMBIO ---
+
     const newOrder: CreateOrderParams = {
       stripeId: orderData.vads_trans_id,
       eventId: orderData.vads_order_id,
       buyerId: orderData.vads_cust_id,
       totalAmount: String(Number(orderData.vads_amount) / 100),
-      createdAt: new Date(orderData.vads_presentation_date),
+      createdAt: creationDate, // Usamos la fecha ya formateada y convertida
       quantity: 1,
     };
 
