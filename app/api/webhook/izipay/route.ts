@@ -7,25 +7,23 @@ export async function POST(req: Request) {
   console.log('Webhook de IziPay recibido.');
 
   try {
-    // CAMBIO IMPORTANTE: Leemos el cuerpo de la petición como JSON directamente.
-    const body = await req.json();
+    // VOLVEMOS A formData(), que es el formato correcto según el error.
+    const formData = await req.formData();
+    
+    // Convertimos el formData a un objeto simple para poder trabajar con él.
+    const params: { [key: string]: any } = {};
+    formData.forEach((value, key) => {
+      params[key] = value;
+    });
 
-    // Extraemos el campo "kr-answer" del objeto JSON.
-    const krAnswer = body['kr-answer'];
+    console.log("Parámetros recibidos del formulario:", JSON.stringify(params, null, 2));
 
-    if (!krAnswer || typeof krAnswer !== 'string') {
-      console.error('Error de Webhook: El campo "kr-answer" no se encontró en el cuerpo JSON o no es un string.');
-      // Loggear el cuerpo completo para depurar qué está llegando
-      console.log('Cuerpo de la petición recibido:', JSON.stringify(body, null, 2));
-      return NextResponse.json({ message: 'Payload inválido o campo kr-answer ausente.' }, { status: 400 });
-    }
-
-    const izipayData = JSON.parse(krAnswer);
-    const receivedSignature = izipayData.signature;
+    // El objeto 'params' ahora contiene directamente todos los campos vads_.
+    const receivedSignature = params.signature;
 
     if (!receivedSignature) {
-      console.error('Error de Webhook: Firma no encontrada en el objeto kr-answer.');
-      return NextResponse.json({ message: 'Firma no encontrada en payload.' }, { status: 400 });
+      console.error('Error de Webhook: El campo "signature" no fue encontrado en los datos del formulario.');
+      return NextResponse.json({ message: 'Firma no encontrada.' }, { status: 400 });
     }
 
     const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
@@ -36,14 +34,14 @@ export async function POST(req: Request) {
     console.log('Longitud de clave leída:', secretKey.length);
 
 
-    // --- LÓGICA DE FIRMA (YA DEBERÍA ESTAR CORRECTA) ---
+    // --- LÓGICA DE FIRMA (Aplicada sobre el objeto 'params' directamente) ---
 
-    const vadsKeys = Object.keys(izipayData)
+    const vadsKeys = Object.keys(params)
       .filter(key => key.startsWith('vads_'))
       .sort();
 
     const string_to_sign = vadsKeys
-      .map(key => izipayData[key])
+      .map(key => params[key])
       .join('+');
 
     const data_to_hash = string_to_sign + '+' + secretKey;
@@ -66,7 +64,7 @@ export async function POST(req: Request) {
     console.log('Firma verificada exitosamente!');
 
     // Tu lógica de negocio
-    const orderData = izipayData;
+    const orderData = params; 
     const newOrder: CreateOrderParams = {
       stripeId: orderData.vads_trans_id,
       eventId: orderData.vads_order_id,
@@ -81,9 +79,6 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error("ERROR BRUTAL EN EL WEBHOOK:", error);
-    if (error instanceof SyntaxError) {
-      console.error("El cuerpo de la petición no es un JSON válido.");
-    }
     return NextResponse.json({ message: `Error en el webhook: ${error.message}` }, { status: 500 });
   }
 }
