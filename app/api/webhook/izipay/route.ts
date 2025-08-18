@@ -7,12 +7,17 @@ export async function POST(req: Request) {
   console.log('Webhook de IziPay recibido.');
 
   try {
-    const formData = await req.formData();
-    const krAnswer = formData.get('kr-answer');
+    // CAMBIO IMPORTANTE: Leemos el cuerpo de la petición como JSON directamente.
+    const body = await req.json();
+
+    // Extraemos el campo "kr-answer" del objeto JSON.
+    const krAnswer = body['kr-answer'];
 
     if (!krAnswer || typeof krAnswer !== 'string') {
-      console.error('Error de Webhook: El campo "kr-answer" no se encontró o no es un string.');
-      return NextResponse.json({ message: 'Payload inválido.' }, { status: 400 });
+      console.error('Error de Webhook: El campo "kr-answer" no se encontró en el cuerpo JSON o no es un string.');
+      // Loggear el cuerpo completo para depurar qué está llegando
+      console.log('Cuerpo de la petición recibido:', JSON.stringify(body, null, 2));
+      return NextResponse.json({ message: 'Payload inválido o campo kr-answer ausente.' }, { status: 400 });
     }
 
     const izipayData = JSON.parse(krAnswer);
@@ -31,26 +36,18 @@ export async function POST(req: Request) {
     console.log('Longitud de clave leída:', secretKey.length);
 
 
-    // --- LÓGICA DE FIRMA DEFINITIVA Y CORRECTA ---
+    // --- LÓGICA DE FIRMA (YA DEBERÍA ESTAR CORRECTA) ---
 
-    // 1. Tomamos las claves DIRECTAMENTE del objeto parseado.
     const vadsKeys = Object.keys(izipayData)
-      // 2. Filtramos solo las claves que empiezan con 'vads_'.
-      //    (Esto automáticamente excluye 'signature', 'kr-hash', etc.)
       .filter(key => key.startsWith('vads_'))
-      // 3. ¡ORDENAMOS ALFABÉTICAMENTE!
       .sort();
 
-    // 4. Mapeamos los valores en el orden correcto.
-    //    NO filtramos los valores vacíos, como sugiere el video.
     const string_to_sign = vadsKeys
       .map(key => izipayData[key])
       .join('+');
 
-    // 5. Añadimos la clave secreta al final para crear la cadena final.
     const data_to_hash = string_to_sign + '+' + secretKey;
 
-    // 6. Calculamos nuestra firma.
     const local_signature = crypto
       .createHmac('sha256', secretKey)
       .update(data_to_hash, 'utf8')
@@ -68,15 +65,15 @@ export async function POST(req: Request) {
 
     console.log('Firma verificada exitosamente!');
 
-    // Tu lógica de negocio (usando 'izipayData' en lugar de 'params')
-    const orderData = izipayData; // Usamos un nombre más claro
+    // Tu lógica de negocio
+    const orderData = izipayData;
     const newOrder: CreateOrderParams = {
       stripeId: orderData.vads_trans_id,
       eventId: orderData.vads_order_id,
       buyerId: orderData.vads_cust_id,
       totalAmount: String(Number(orderData.vads_amount) / 100),
       createdAt: new Date(orderData.vads_presentation_date),
-      quantity: 1, // Debes ajustar esto si puede ser más de 1
+      quantity: 1,
     };
 
     const createdOrder = await createOrder(newOrder);
@@ -84,6 +81,9 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error("ERROR BRUTAL EN EL WEBHOOK:", error);
+    if (error instanceof SyntaxError) {
+      console.error("El cuerpo de la petición no es un JSON válido.");
+    }
     return NextResponse.json({ message: `Error en el webhook: ${error.message}` }, { status: 500 });
   }
 }
