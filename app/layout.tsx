@@ -3,6 +3,7 @@ import { Poppins } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { esES } from "@clerk/localizations";
 import './globals.css'
+import Script from "next/script";
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -47,6 +48,33 @@ export default function RootLayout({
           </noscript>
           {/* End Google Tag Manager (noscript) */}
           {children}
+          {/* --- INICIO: CÓDIGO CULQI --- */}
+          {/* 2. Carga el script externo de Culqi */}
+          <Script id="culqi-library" src="https://checkout.culqi.com/js/v4" strategy="afterInteractive" />
+          {/* 3. Configura la llave pública y prepara la función de callback */}
+          <Script id="culqi-configuration" strategy="afterInteractive" dangerouslySetInnerHTML={{
+            __html: `
+              function configureCulqi() {
+                if (typeof Culqi !== 'undefined') {
+                  Culqi.publicKey = '${process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY}';
+                  console.log("Culqi configurado exitosamente.");
+                } else {
+                  console.warn("El objeto Culqi no está disponible. Reintentando...");
+                  setTimeout(configureCulqi, 500); // Reintenta si el script aún no ha cargado
+                }
+              }
+
+              // Define la función global que será llamada por Culqi
+              window.culqi = function() {
+                // Dejaremos esta función vacía por ahora.
+                // La llenaremos en el siguiente paso.
+                console.log("Función culqi() llamada.");
+              };
+
+              configureCulqi();
+            `,
+          }} />
+          {/* --- FIN: CÓDIGO CULQI --- */}
         </body>
       </html>
     </ClerkProvider>

@@ -7,7 +7,7 @@ import { SignedIn, useUser } from '@clerk/nextjs'
 import React, { useCallback } from 'react'
 import { Button } from '../ui/button'
 import Link from 'next/link'
-import Checkout from './Checkout'
+
 
 const CheckoutButton = ({event}: {event:IEvent}) => {
     const {user} = useUser();
@@ -57,8 +57,11 @@ const CheckoutButton = ({event}: {event:IEvent}) => {
             </SignedOut>
 
             <SignedIn>
-                <Checkout event={event} userId={userId}/>
-
+                <Button asChild className='button rounded-full bg-red-600 hover:bg-red-700 text-white' size="lg">
+                    <Link href={`/events/${event._id}/checkout`} onClick={handleBeginCheckoutClick}>
+                        Comprar Entradas
+                    </Link>
+                </Button>
             </SignedIn>
             </>
         )}

@@ -228,6 +228,18 @@ body {
   .toggle-switch {
     @apply bg-gray-300 !important;
   }
+
+  .input-field-pink {
+    @apply border-2 border-pink-200 bg-white h-[54px] focus-visible:ring-offset-0 placeholder:text-grey-500 rounded-full p-regular-16 px-4 py-3 focus-visible:ring-transparent !important;
+  }
+
+  .select-field-pink {
+    @apply w-full bg-white h-[54px] placeholder:text-grey-500 rounded-full p-regular-16 px-5 py-3 border-2 border-pink-200 focus-visible:ring-transparent focus:ring-transparent !important;
+  }
+
+  .textarea-pink {
+    @apply bg-white flex flex-1 placeholder:text-grey-500 p-regular-16 px-5 py-3 border-2 border-pink-200 focus-visible:ring-transparent !important;
+  }
 }
 
 /* ========================================== CLERK STYLES */
