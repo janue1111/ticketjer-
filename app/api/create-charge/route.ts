@@ -3,11 +3,22 @@ import { NextResponse } from "next/server";
 import Culqi from 'culqi-node';
 import { createOrder } from "@/lib/actions/order.actions";
 
-// 1. Inicializa Culqi con tu llave secreta
-const culqi = new Culqi({ privateKey: process.env.CULQI_SECRET_KEY! });
-
 export async function POST(request: Request) {
   try {
+    // 1. Inicializa Culqi con tu llave secreta solo cuando sea necesario
+    const culqiSecretKey = process.env.CULQI_SECRET_KEY;
+    
+    if (!culqiSecretKey) {
+      return new NextResponse(
+        JSON.stringify({ message: "Configuración de Culqi no disponible." }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+    
+    const culqi = new Culqi({ privateKey: culqiSecretKey });
     const body = await request.json();
     // Extraemos el email del comprador de los datos que envías.
     // Si no lo envías, puedes usar uno genérico.
