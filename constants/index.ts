@@ -28,6 +28,8 @@ export const headerLinks = [
        dateUrl: '',
        zoneMapUrl: '',
      },
+    standardDescription: '',
+    scenarioImageUrl: '',
     startDateTime: new Date(),
     endDateTime: new Date(),
     categoryId: '',

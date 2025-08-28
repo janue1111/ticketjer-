@@ -27,6 +27,21 @@ const populateEvent = (query: any) => {
     .populate({ path: 'category', model: Category, select: '_id name' })
 }
 
+// GENERATE UNIQUE SLUG
+const generateUniqueSlug = async (baseSlug: string): Promise<string> => {
+  await connectToDatabase()
+  
+  let slug = baseSlug
+  let counter = 1
+  
+  while (await Event.findOne({ slug })) {
+    slug = `${baseSlug}-${counter}`
+    counter++
+  }
+  
+  return slug
+}
+
 // CREATE
 export async function createEvent({ userId, event, path }: CreateEventParams) {
   try {
@@ -35,7 +50,15 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
     const organizer = await User.findById(userId)
     if (!organizer) throw new Error('Organizer not found')
 
-    const newEvent = await Event.create({ ...event, category: event.categoryId, organizer: userId })
+    // Generate unique slug if provided
+    const uniqueSlug = event.slug ? await generateUniqueSlug(event.slug) : undefined
+
+    const newEvent = await Event.create({ 
+      ...event, 
+      slug: uniqueSlug,
+      category: event.categoryId, 
+      organizer: userId 
+    })
     revalidatePath(path)
 
     return JSON.parse(JSON.stringify(newEvent))

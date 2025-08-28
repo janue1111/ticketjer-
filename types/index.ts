@@ -20,9 +20,18 @@ export type CreateEventParams = {
   userId: string
   event: {
     title: string
+    slug?: string
     description: string
     location: string
     imageUrl: string
+    immersiveImages?: {
+      backgroundUrl?: string
+      artistUrl?: string
+      dateUrl?: string
+      zoneMapUrl?: string
+    }
+    standardDescription?: string
+    scenarioImageUrl?: string
     startDateTime: Date
     endDateTime: Date
     categoryId: string
@@ -49,9 +58,18 @@ export type UpdateEventParams = {
   event: {
     _id: string
     title: string
+    slug?: string
     imageUrl: string
     description: string
     location: string
+    immersiveImages?: {
+      backgroundUrl?: string
+      artistUrl?: string
+      dateUrl?: string
+      zoneMapUrl?: string
+    }
+    standardDescription?: string
+    scenarioImageUrl?: string
     startDateTime: Date
     endDateTime: Date
     categoryId: string
@@ -105,6 +123,14 @@ export type GetRelatedEventsByCategoryParams = {
   description: string
   imageUrl: string
   location: string
+  immersiveImages?: {
+    backgroundUrl?: string
+    artistUrl?: string
+    dateUrl?: string
+    zoneMapUrl?: string
+  }
+  standardDescription?: string
+  scenarioImageUrl?: string
   startDateTime: Date
   endDateTime: Date
   url: string

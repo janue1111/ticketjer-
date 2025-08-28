@@ -14,6 +14,8 @@ export interface IEvent extends Document {
     dateUrl?: string;
     zoneMapUrl?: string;
   };
+  standardDescription?: string;
+  scenarioImageUrl?: string;
   startDateTime: Date;
   endDateTime: Date;
   url?: string;
@@ -62,6 +64,8 @@ const EventSchema = new Schema({
     dateUrl: { type: String },
     zoneMapUrl: { type: String },
   },
+  standardDescription: { type: String },
+  scenarioImageUrl: { type: String },
   startDateTime: { type: Date, default: Date.now },
   endDateTime: { type: Date, default: Date.now },
   url: { type: String },

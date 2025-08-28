@@ -74,7 +74,7 @@ const TierFields = ({ nestIndex, control }: { nestIndex: number; control: Contro
               <FormItem className="w-full">
                 <FormLabel>Precio</FormLabel>
                 <FormControl>
-sd                  <Input type="number" placeholder="100.00" {...field} value={field.value || '0'} className="input-field" />
+                  <Input type="number" placeholder="100.00" {...field} value={field.value || '0'} className="input-field" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -138,6 +138,8 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
           location: event.location ?? eventDefaultValues.location,
           imageUrl: event.imageUrl ?? eventDefaultValues.imageUrl,
           immersiveImages: event.immersiveImages ?? eventDefaultValues.immersiveImages,
+          standardDescription: event.standardDescription ?? eventDefaultValues.standardDescription,
+          scenarioImageUrl: event.scenarioImageUrl ?? eventDefaultValues.scenarioImageUrl,
           startDateTime: new Date(event.startDateTime ?? eventDefaultValues.startDateTime),
           endDateTime: new Date(event.endDateTime ?? eventDefaultValues.endDateTime),
           categoryId: event.category?._id ?? eventDefaultValues.categoryId,
@@ -324,6 +326,55 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
                     <FormLabel>URL Imagen del Mapa de Zonas</FormLabel>
                     <FormControl>
                       <Input placeholder="https://..." {...field} value={field.value || ''} className="input-field" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        )}
+        {form.watch('layoutType') === 'standard' && (
+          <div className="flex flex-col gap-5">
+            <h4 className="p-bold-18">Información Adicional para Evento Standard</h4>
+            <div className="flex flex-col gap-5 md:flex-row">
+              <FormField
+                control={form.control}
+                name="standardDescription"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Descripción del Evento (máx. 100 palabras)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Describe los detalles específicos de tu evento..." 
+                        {...field} 
+                        className="textarea rounded-2xl h-32"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const wordCount = value.trim().split(/\s+/).filter(word => word.length > 0).length;
+                          if (wordCount <= 100 || value === '') {
+                            field.onChange(value);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <div className="text-sm text-gray-500">
+                      Palabras: {field.value ? field.value.trim().split(/\s+/).filter(word => word.length > 0).length : 0}/100
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex flex-col gap-5 md:flex-row">
+              <FormField
+                control={form.control}
+                name="scenarioImageUrl"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>URL de Imagen del Escenario</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://i.imgur.com/..." {...field} value={field.value || ''} className="input-field" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

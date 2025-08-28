@@ -30,6 +30,14 @@ export const eventFormSchema = z.object({
       dateUrl: z.string().url().or(z.literal('')).optional(),
       zoneMapUrl: z.string().url().or(z.literal('')).optional(),
     }).optional(),
+    standardDescription: z.string().refine((val) => {
+      if (!val) return true;
+      const wordCount = val.trim().split(/\s+/).filter(word => word.length > 0).length;
+      return wordCount <= 100;
+    }, {
+      message: 'La descripción no puede exceder 100 palabras'
+    }).optional(),
+    scenarioImageUrl: z.string().url().or(z.literal('')).optional(),
     startDateTime:z.date(),
     endDateTime:z.date(),
     categoryId:z.string(),

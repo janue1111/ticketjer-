@@ -91,6 +91,35 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
     </div>
   </section>
 
+  {/* STANDARD EVENT DESCRIPTION AND SCENARIO */}
+  {event.layoutType === 'standard' && (event.standardDescription || event.scenarioImageUrl) && (
+    <section className="wrapper my-8 flex flex-col gap-8">
+      {event.standardDescription && (
+        <div className="flex flex-col gap-4">
+          <h3 className="h3-bold">Descripción del Evento</h3>
+          <p className="p-regular-18 text-gray-700 leading-relaxed">
+            {event.standardDescription}
+          </p>
+        </div>
+      )}
+      
+      {event.scenarioImageUrl && (
+        <div className="flex flex-col gap-4">
+          <h3 className="h3-bold text-center">ESCENARIO</h3>
+          <div className="relative w-full max-w-4xl mx-auto">
+            <Image 
+              src={event.scenarioImageUrl}
+              alt="ESCENARIO"
+              width={1000}
+              height={600}
+              className="w-full h-auto object-cover rounded-xl shadow-lg"
+            />
+          </div>
+        </div>
+      )}
+    </section>
+  )}
+
   {/* EVENTS WITH SAME CATEGORY */}
   <section className="wrapper my-8 flex flex-col gap-8 md:gap-12">
     <h2 className="h2-bold">Eventos Relacionados</h2>

@@ -76,7 +76,7 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
   const vads_params: { [key: string]: string | number } = {
     vads_action_mode: 'INTERACTIVE',
     vads_amount: amount,
-    vads_ctx_mode: 'TEST', // O 'PRODUCTION' en producción
+    vads_ctx_mode: 'PRODUCTION', // O 'PRODUCTION' en producción
     vads_currency: '604', // PEN
     vads_page_action: 'PAYMENT',
     vads_payment_config: 'SINGLE',
@@ -120,7 +120,7 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
     .join('+');
 
   // --- Cálculo de la firma (Método HMAC) ---
-  const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
+  const secretKey = process.env.IZIPAY_PROD_SECRET_KEY!;
   const data_to_hash = string_to_sign + '+' + secretKey;
 
   const signature = crypto
