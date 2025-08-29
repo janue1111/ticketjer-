@@ -25,10 +25,20 @@ export async function POST(req: Request) {
       console.error('Error de Webhook: El campo "signature" no fue encontrado en los datos del formulario.');
       return NextResponse.json({ message: 'Firma no encontrada.' }, { status: 400 });
     }
+    const vadsCtxMode = params.vads_ctx_mode;
+    let secretKey: string | undefined;
 
-    const secretKey = process.env.IZIPAY_TEST_SECRET_KEY!;
+    if (vadsCtxMode === 'PRODUCTION') {
+      secretKey = process.env.IZIPAY_PROD_SECRET_KEY;
+    } else if (vadsCtxMode === 'TEST') {
+      secretKey = process.env.IZIPAY_TEST_SECRET_KEY;
+    } else {
+      console.error(`ERROR CRÍTICO: vads_ctx_mode desconocido: ${vadsCtxMode}`);
+      return NextResponse.json({ message: 'Modo de contexto Izipay desconocido.' }, { status: 400 });
+    }
+
     if (!secretKey) {
-        console.error("ERROR CRÍTICO: IZIPAY_TEST_SECRET_KEY no está definida en el entorno.");
+        console.error(`ERROR CRÍTICO: La clave secreta para el modo ${vadsCtxMode} no está definida en el entorno.`);
         return NextResponse.json({ message: 'Error de configuración del servidor' }, { status: 500 });
     }
     console.log('Longitud de clave leída:', secretKey.length);
