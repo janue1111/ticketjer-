@@ -25,6 +25,24 @@ const IzipayForm: React.FC<IzipayFormProps> = ({ params, izipayUrl }) => {
       }
     }
 
+    // Añadir campos estáticos para URLs de redirección y configuración de tema
+    const staticFields = {
+      vads_url_success: 'https://www.ticketsaso.com/success',
+      vads_url_refused: 'https://www.ticketsaso.com/pago-rechazado',
+      vads_url_cancel: 'https://www.ticketsaso.com/pago-cancelado',
+      vads_theme_config: 'SUCCESS_FOOTER_MSG_RETURN=DESCARGA TU TICKET',
+    };
+
+    for (const key in staticFields) {
+      if (Object.prototype.hasOwnProperty.call(staticFields, key)) {
+        const hiddenField = document.createElement('input');
+        hiddenField.type = 'hidden';
+        hiddenField.name = key;
+        hiddenField.value = staticFields[key as keyof typeof staticFields];
+        form.appendChild(hiddenField);
+      }
+    }
+
     // Añadir el formulario al body y enviarlo
     document.body.appendChild(form);
     form.submit();
