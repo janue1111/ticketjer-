@@ -87,6 +87,11 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
     vads_order_id: order.eventId, // Usamos eventId como identificador único de la orden
     vads_cust_email: buyerEmail,
     vads_cust_id: order.buyerId, // <- AÑADIDO AQUI
+    // --- Campos de personalización ---
+    vads_url_success: `${process.env.NEXT_PUBLIC_SERVER_URL}/success`,
+    vads_url_refused: `${process.env.NEXT_PUBLIC_SERVER_URL}/pago-rechazado`,
+    vads_url_cancel: `${process.env.NEXT_PUBLIC_SERVER_URL}/pago-cancelado`,
+    vads_theme_config: 'SUCCESS_FOOTER_MSG_RETURN=DESCARGA TU TICKET',
   };
 
   // --- Creación de la cadena para firmar ---
@@ -102,8 +107,12 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
     'vads_page_action',
     'vads_payment_config',
     'vads_site_id',
+    'vads_theme_config',
     'vads_trans_date',
     'vads_trans_id',
+    'vads_url_cancel',
+    'vads_url_refused',
+    'vads_url_success',
     'vads_version'
   ];
 
