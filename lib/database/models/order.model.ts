@@ -13,6 +13,7 @@ export interface IOrder extends Document {
     lastName: string
   }
   quantity: number;
+  status: string;
 }
 
 export type IOrderItem = {
@@ -48,6 +49,11 @@ const OrderSchema = new Schema({
   quantity: {
     type: Number,
     required: true,
+  },
+  status: {
+    type: String,
+    required: true,
+    default: 'pending',
   },
 })
 

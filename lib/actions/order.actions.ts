@@ -217,6 +217,46 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
   }
 }
 
+export async function updateOrderStatus(orderId: string, newStatus: string) {
+  try {
+    await connectToDatabase();
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, { status: newStatus }, { new: true });
+    if (!updatedOrder) throw new Error('Order not found');
+    return JSON.parse(JSON.stringify(updatedOrder));
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+// GET ORDER BY ID
+export async function getOrderById(orderId: string) {
+  try {
+    await connectToDatabase()
+
+    const order = await Order.findById(orderId)
+      .populate({
+        path: 'event',
+        model: Event,
+        populate: {
+          path: 'organizer',
+          model: User,
+          select: '_id firstName lastName',
+        },
+      })
+      .populate({
+        path: 'buyer',
+        model: User,
+        select: '_id firstName lastName',
+      })
+
+    if (!order) throw new Error('Order not found')
+
+    return JSON.parse(JSON.stringify(order))
+  } catch (error) {
+    handleError(error)
+  }
+}
+
 // GET ORDERS BY USER
 export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUserParams) {
   try {
