@@ -8,15 +8,16 @@ import { useAuth } from "@clerk/nextjs";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 
 type CardProps = {
- event: IEvent;
- hasOrderLink?: boolean;
- hidePrice?: boolean;
- orderQuantity?: number;
-};
+  event: IEvent;
+  hasOrderLink?: boolean;
+  hidePrice?: boolean;
+  orderQuantity?: number;
+  orderId?: string;
+ };
 
- const Card = ({ event, hasOrderLink, hidePrice, orderQuantity }: CardProps) => {
-  const { userId } = useAuth();
-  const isEventCreator = event.organizer._id.toString() === userId;
+  const Card = ({ event, hasOrderLink, hidePrice, orderQuantity, orderId }: CardProps) => {
+   const { userId } = useAuth();
+   const isEventCreator = event.organizer._id.toString() === userId;
 
   // Precio más bajo de la fase activa
   const activePhase = event.pricingPhases?.find((phase) => phase.active);
@@ -40,11 +41,17 @@ type CardProps = {
     });
   }, [event, lowestPrice]);
 
+  const linkHref = orderId
+    ? `/tickets/${orderId}`
+    : event.layoutType === 'immersive' && event.slug
+    ? `/eventos-especiales/${event.slug}`
+    : `/events/${event._id}`;
+
   return (
     <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
       {/* Imagen superior cuadrada con cover */}
       <Link 
-        href={event.layoutType === 'immersive' && event.slug ? `/eventos-especiales/${event.slug}` : `/events/${event._id}`}
+        href={linkHref}
         className="block" 
         onClick={handleViewItemClick}
       >
@@ -88,7 +95,7 @@ type CardProps = {
         </div>
 
         <Link 
-          href={event.layoutType === 'immersive' && event.slug ? `/eventos-especiales/${event.slug}` : `/events/${event._id}`}
+          href={linkHref}
           className="mb-1" 
           onClick={handleViewItemClick}
         >

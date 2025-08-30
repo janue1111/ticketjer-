@@ -38,6 +38,7 @@ const Collection = ({
                 const hasOrderLink = collectionType === "Events_Organized";
                 const hidePrice = collectionType === "My_Tickets";
                 const orderQuantity = isMyTickets ? (item as IOrder).quantity : undefined;
+                const orderId = isMyTickets ? (item as IOrder)._id.toString() : undefined;
 
                 return (
                   <li key={key} className="w-full">
@@ -46,6 +47,7 @@ const Collection = ({
                       hasOrderLink={hasOrderLink}
                       hidePrice={hidePrice}
                       orderQuantity={orderQuantity}
+                      orderId={orderId}
                     />
                   </li>
                 );
