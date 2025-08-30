@@ -4,8 +4,8 @@ import { getOrderById } from '@/lib/actions/order.actions';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
-const TicketPage = async ({ params }: { params: { orderId: string } }) => {
-  const { orderId } = params;
+export default async function TicketPage({ params }: { params: Promise<{ orderId: string }> }) {
+  const { orderId } = await params;
   const { sessionClaims } = await auth();
   const userId = sessionClaims?.userId as string;
 
@@ -59,5 +59,3 @@ const TicketPage = async ({ params }: { params: { orderId: string } }) => {
     </section>
   );
 };
-
-export default TicketPage;
