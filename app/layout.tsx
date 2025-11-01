@@ -75,6 +75,9 @@ export default function RootLayout({
             `,
           }} />
           {/* --- FIN: CÓDIGO CULQI --- */}
+          {/* --- INICIO: CÓDIGO IZIPAY --- */}
+          <Script id="izipay-library" src="https://sandbox-checkout.izipay.pe/payments/v1/js/index.js" strategy="afterInteractive" />
+          {/* --- FIN: CÓDIGO IZIPAY --- */}
         </body>
       </html>
     </ClerkProvider>

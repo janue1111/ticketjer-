@@ -3,36 +3,39 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { IEvent } from "@/lib/database/models/event.model";
-import { checkoutOrder } from "@/lib/actions/order.actions";
 import { Input } from "@/components/ui/input";
-import IzipayForm from "@/components/shared/IzipayForm";
 import { useUser } from "@clerk/nextjs";
 
+declare global {
+  interface Window {
+    Izipay?: any;
+    culqi?: any;
+    Culqi?: any;
+    dataLayer?: any[];
+  }
+}
+
 const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) => {
-  const { user } = useUser();
+  const { user } = useUser() || { user: null }; // Mock user when not in ClerkProvider
   const [quantity, setQuantity] = useState(1);
-  const [izipayParams, setIzipayParams] = useState<{[key: string]: string | number} | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const activePhase = event.pricingPhases?.find((phase) => phase.active);
   const prices = activePhase?.tiers?.map((tier) => Number(tier.price)).filter((p) => !Number.isNaN(p)) || [];
   const lowestPrice: number | null = prices.length > 0 ? Math.min(...prices) : null;
-  const amountInCents = Math.round((lowestPrice ?? 0) * quantity * 100);
+  const amount = (lowestPrice ?? 0) * quantity;
 
-  const createCharge = async (tokenId: string) => {
-    setPaymentError(null);
+  const handleIzipayCheckout = async () => {
     setIsProcessing(true);
+    setPaymentError(null);
     try {
-      const response = await fetch('/api/create-charge', {
+      const response = await fetch('/api/izipay/create-token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tokenId: tokenId,
-          eventId: event._id,
-          amount: amountInCents,
-          quantity: quantity,
-          buyerId: userId,
+          amount: amount,
+          orderNumber: `ORDER-${Date.now()}`,
         }),
       });
 
@@ -41,120 +44,77 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
         throw new Error(errorResult.message || 'El pago no pudo ser procesado.');
       }
 
-      const newOrder = await response.json();
-      console.log('Orden creada en la BD:', newOrder);
-      window.location.href = `/orders`;
+      const izipayResponse = await response.json();
+      const sessionToken = izipayResponse.Response.Token;
+
+      const iziConfig = {
+        publicKey: process.env.NEXT_PUBLIC_IZIPAY_PUBLIC_KEY,
+        config: {
+          transactionId: Math.random().toString(36).substring(7),
+          action: 'pay',
+          merchantCode: process.env.NEXT_PUBLIC_IZIPAY_MERCHANT_CODE,
+          order: {
+            orderNumber: `ORDER-${Date.now()}`,
+            currency: 'PEN',
+            amount: amount,
+            payMethod: "CARD,QR",
+            processType: 'AT',
+            merchantBuyerId: userId,
+            installments: '00',
+            dateTimeTransaction: new Date().toISOString(),
+          },
+          billing: {
+            firstName: user?.firstName || 'Test',
+            lastName: user?.lastName || 'User',
+            email: user?.emailAddresses[0]?.emailAddress || 'test@user.com',
+            phoneNumber: '',
+            street: '',
+            city: '',
+            state: '',
+            country: 'PE',
+            postalCode: '',
+            document: '',
+            documentType: 'DNI',
+          },
+          render: {
+            typeForm: window.Izipay.enums.typeForm.POP_UP,
+            container: '#your-iframe-payment',
+            showButtonProcessForm: true,
+            redirectUrls: {
+              onSuccess: process.env.NEXT_PUBLIC_IZIPAY_SUCCESS_URL,
+              onError: process.env.NEXT_PUBLIC_IZIPAY_ERROR_URL,
+              onCancel: process.env.NEXT_PUBLIC_IZIPAY_CANCEL_URL,
+            }
+          },
+          appearance: {
+            logo: 'https://demo-izipay.azureedge.net/test/img/millasb.svg',
+          },
+        },
+      };
+
+      const izi = new window.Izipay({ config: iziConfig });
+
+      const callbackResponsePayment = (response: any) => {
+        if (response.code === '00') {
+          window.location.href = '/orders';
+        } else {
+          setPaymentError('El pago fue rechazado. Por favor, intente de nuevo.');
+        }
+        setIsProcessing(false);
+      };
+
+      izi.LoadForm({
+        autorization: sessionToken,
+        keyRSA: 'RSA', // This is a placeholder, check Izipay docs if a real key is needed
+        callbackResponse: callbackResponsePayment
+      });
+
     } catch (error: any) {
-      console.error("Error in createCharge:", error);
-      setPaymentError(error.message);
-    } finally {
+      console.error("Error in Izipay Checkout:", error);
+      setPaymentError("No se pudo iniciar el pago con Izipay.");
       setIsProcessing(false);
     }
   };
-
-  useEffect(() => {
-    const culqiHandler = () => {
-      if (Culqi.token) {
-        console.log('Token recibido:', Culqi.token.id);
-        createCharge(Culqi.token.id);
-      } else if (Culqi.error) {
-        console.error('Error de Culqi:', Culqi.error);
-        setPaymentError(Culqi.error.user_message || 'Ocurrió un error con Culqi.');
-        setIsProcessing(false); // <-- Added this line
-      } else {
-        // User simply closed the modal
-        setIsProcessing(false); // <-- Added this line
-      }
-    };
-
-    window.culqi = culqiHandler;
-
-    return () => {
-      if (window.culqi === culqiHandler) {
-        window.culqi = () => {};
-      }
-    };
-  }, [event, quantity, userId, amountInCents]);
-
-  const handleIzipayCheckout = async () => {
-    setIsProcessing(true);
-    setPaymentError(null);
-    try {
-        const order = {
-            eventTitle: event.title,
-            eventId: event._id,
-            price: String(lowestPrice ?? 0),
-            isFree: (lowestPrice ?? 0) === 0,
-            buyerId: userId,
-            quantity: quantity,
-        };
-        const params = await checkoutOrder(order);
-        setIzipayParams(params);
-    } catch (error) {
-        console.error("Error en Izipay Checkout:", error);
-        setPaymentError("No se pudo iniciar el pago con Izipay.");
-    } finally {
-        // On Izipay, processing stops when the form is submitted and redirected
-        // so we might not need to set isProcessing back to false here
-    }
-  };
-
-  const handleCulqiPayment = async () => {
-    setIsProcessing(true);
-    setPaymentError(null);
-    try {
-      // --- PASO 1: Crear la Orden en nuestro backend ---
-      const orderResponse = await fetch('/api/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: amountInCents,
-          description: `Compra de entradas para: ${event.title}`,
-          eventId: event._id,
-          userEmail: user?.emailAddresses[0]?.emailAddress ?? 'no-email@example.com',
-        }),
-      });
-
-      if (!orderResponse.ok) {
-        const errorResult = await orderResponse.json();
-        throw new Error(errorResult.message || 'No se pudo crear la orden de pago.');
-      }
-      const order = await orderResponse.json();
-
-      // --- PASO 2: Configurar y abrir el Checkout de Culqi con la Orden ---
-      Culqi.settings({
-        title: event.title,
-        currency: 'PEN',
-        amount: amountInCents,
-        order: order.id, // <-- ¡Este es el paso clave!
-      });
-      Culqi.open();
-    } catch (error: any) {
-      console.error("Error en el flujo de pago Culqi:", error);
-      setPaymentError(error.message);
-      setIsProcessing(false); // Also stop processing on error before opening modal
-    } finally {
-      // Note: setIsProcessing(false) is removed from here, because now
-      // the action finalizes when the user closes the modal (in the useEffect).
-    }
-  };
-
-  const handleBeginCheckoutClick = useCallback(() => {
-    const unitPrice = lowestPrice ?? 0;
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: 'begin_checkout',
-      currency: 'PEN',
-      value: unitPrice * quantity,
-      items: [{
-        item_id: event._id,
-        item_name: event.title,
-        item_category: event.category?.name,
-        price: unitPrice,
-        quantity: quantity,
-      }],
-    });
-  }, [event, quantity, lowestPrice]);
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -162,10 +122,6 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
       setQuantity(value);
     }
   };
-
-  if (izipayParams) {
-    return <IzipayForm params={izipayParams} izipayUrl={process.env.NEXT_PUBLIC_IZIPAY_URL!} />;
-  }
 
   return (
     <div>
@@ -182,32 +138,17 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
 
       <div className="payment-options-container flex flex-col sm:flex-row items-center gap-3 mt-4">
         <Button
-          onClick={() => {
-            handleBeginCheckoutClick();
-            handleIzipayCheckout();
-          }}
+          onClick={handleIzipayCheckout}
           role="link"
           size="lg"
           className="button w-full sm:w-fit rounded-full bg-red-600 hover:bg-red-700 text-white"
           disabled={isProcessing}
         >
-          Pagar con Izipay
-        </Button>
-        <Button
-          id="culqi-payment-button"
-          onClick={() => {
-            handleBeginCheckoutClick();
-            handleCulqiPayment();
-          }}
-          role="link"
-          size="lg"
-          className="button w-full sm:w-fit rounded-full bg-blue-600 hover:bg-blue-700 text-white"
-          disabled={isProcessing}
-        >
-          {isProcessing ? 'Procesando...' : 'Pagar con Tarjeta (Culqi)'}
+          {isProcessing ? 'Procesando...' : 'Pagar con Izipay'}
         </Button>
       </div>
       {paymentError && <p className="text-red-500 mt-4">{paymentError}</p>}
+      <div id="your-iframe-payment"></div>
     </div>
   );
 };

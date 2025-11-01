@@ -1,27 +1,30 @@
-import { NextResponse } from 'next/server';
-import { updateOrderStatus } from '@/lib/actions/order.actions';
-import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
+import { updateOrderStatus } from '@/lib/actions/order.actions'
 
-// NOTA: La validación real requiere un hash o firma que Izipay debería enviar.
-// Por ahora, confiamos en la data, pero esto debería fortalecerse.
+function isValidSignature(body: string, signature: string, secret: string): boolean {
+  const hash = crypto.createHmac('sha256', secret).update(body).digest('hex');
+  return hash === signature;
+}
 
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await request.json();
-    const transactionData = body.kr_answer; // Asumiendo que la data principal viene aquí
+    const rawBody = await req.text()
+    const notification = JSON.parse(rawBody)
+    const signature = req.headers.get('izipay-signature')
+    const secret = process.env.IZIPAY_WEBHOOK_SECRET
 
-    if (transactionData && transactionData.orderStatus === 'PAID') {
-      const orderId = transactionData.orderDetails.orderId;
-
-      if (orderId) {
-        await updateOrderStatus(orderId, 'completed');
-        console.log(`Orden ${orderId} actualizada a completada.`);
-      }
+    if (!signature || !secret || !isValidSignature(rawBody, signature, secret)) {
+      return NextResponse.json({ message: 'Invalid signature.' }, { status: 401 })
     }
 
-    return NextResponse.json({ message: 'Webhook procesado' }, { status: 200 });
+    // Process the notification
+    const { orderId, status } = notification
+    await updateOrderStatus(orderId, status)
+
+    return NextResponse.json({ status: 'received' })
   } catch (error) {
-    console.error('Error en el webhook de Izipay:', error);
-    return NextResponse.json({ message: 'Error procesando el webhook' }, { status: 500 });
+    console.error('Error processing Izipay webhook:', error)
+    return NextResponse.json({ message: 'An error occurred while processing the webhook.' }, { status: 500 })
   }
 }
