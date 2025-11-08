@@ -76,7 +76,7 @@ export default function IzipaySDKForm({
   }, []);
 
   // Función para obtener el token de sesión y preparar la orden
-  const prepareOrderAndGetToken = async (): Promise<{ sessionToken: string; orderId: string; izipayTransactionId: string } | null> => {
+  const prepareOrderAndGetToken = async (): Promise<{ sessionToken: string; orderNumber: string; izipayTransactionId: string } | null> => {
     try {
       const response = await fetch('/api/prepare-order', {
         method: 'POST',
@@ -97,7 +97,7 @@ export default function IzipaySDKForm({
       }
 
       const data = await response.json();
-      return { sessionToken: data.sessionToken, orderId: data.orderId, izipayTransactionId: data.izipayTransactionId };
+      return { sessionToken: data.sessionToken, orderNumber: data.orderNumber, izipayTransactionId: data.izipayTransactionId };
     } catch (err) {
       console.error('Error en prepareOrderAndGetToken:', err);
       throw err;
@@ -122,7 +122,7 @@ export default function IzipaySDKForm({
         throw new Error('No se pudo obtener el token de sesión');
       }
 
-      const { sessionToken, orderId, izipayTransactionId } = sessionData;
+      const { sessionToken, orderNumber, izipayTransactionId } = sessionData;
 
       const nameParts = buyerName.split(' ');
       const firstName = nameParts[0] || 'Cliente';
@@ -135,7 +135,7 @@ export default function IzipaySDKForm({
           action: 'pay',
           merchantCode: process.env.NEXT_PUBLIC_IZIPAY_MERCHANT_CODE || '4004353',
           order: {
-            orderNumber: orderId,
+            orderNumber: orderNumber,
             currency: process.env.NEXT_PUBLIC_IZIPAY_CURRENCY || 'PEN',
             amount: amount.toFixed(2),
             processType: 'AT',
