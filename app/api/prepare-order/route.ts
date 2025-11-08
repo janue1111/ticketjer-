@@ -43,10 +43,12 @@ export async function POST(request: Request) {
     // Acción de Corrección: Usar el monto en la unidad base (ej. "10.00")
     const amountAsNumber = parseFloat(totalAmount);
 
+    const truncatedOrderNumber = orderId.toString().slice(-15);
+
     const izipayRequestBody = {
       requestSource: "ECOMMERCE",
       merchantCode: merchantCode,
-      orderNumber: orderId.toString().slice(-15), // Usamos nuestro ID de orden como orderNumber
+      orderNumber: truncatedOrderNumber, // Usamos nuestro ID de orden como orderNumber
       publicKey: publicKey,
       amount: amountAsNumber.toFixed(2),
     };
@@ -99,7 +101,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       sessionToken: izipayResponse.response.token,
       izipayTransactionId: transactionId,
-      orderId: orderId,
+      orderNumber: truncatedOrderNumber,
     }, { status: 200 });
 
   } catch (error) {
