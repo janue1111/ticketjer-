@@ -1,0 +1,20 @@
+{
+  "name": "@izipay/examples-checkout",
+  "version": "1.0.0",
+  "description": "Project sample code for load checkout from izipay js",
+  "scripts": {
+    "server": "node server.js"
+  },
+  "keywords": [
+    "izipay",
+    "checkout"
+  ],
+  "homepage": "http://127.0.0.1:5500",
+  "proxy": "http://localhost:4242",
+  "author": "dpaniagua@izipay.pe",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}

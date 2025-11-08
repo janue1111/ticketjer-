@@ -1,0 +1,31 @@
+image: node:16
+
+pipelines:
+  default:
+    - step:
+        name: 'Build and Deploy'
+        caches:
+          - node
+        script:
+          - npm install
+          - npm run build
+
+          # Configurar la VPN Ivanti (ajusta según tu configuración)
+          # Reemplaza 'vpn-server' y 'vpn-username' con tus valores reales
+          - ivanti-vpn-cli connect --server vpn-server --username vpn-username --password $VPN_PASSWORD
+
+          # Realizar el despliegue a través de la VPN (ajusta según tu caso)
+          - scp -r build/* username@tu-servidor-iis:/ruta/del/sitio/web
+
+          # Desconectar la VPN Ivanti después del despliegue (opcional)
+          - ivanti-vpn-cli disconnect
+
+    - step:
+        name: 'Deployment to Staging'
+        deployment: staging
+        script:
+          - echo "Your deployment to staging script goes here..."
+
+definitions:
+  caches:
+    node: ~/.npm
