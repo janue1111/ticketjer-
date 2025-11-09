@@ -175,12 +175,13 @@ export type CreateCategoryParams = {
 }
 
 export type CreateOrderParams = {
-  stripeId: string
+  transactionId: string
   eventId: string
   buyerId: string
   totalAmount: string
   createdAt: Date
   quantity: number
+  status?: string
 }
 
 export type GetOrdersByEventParams = {

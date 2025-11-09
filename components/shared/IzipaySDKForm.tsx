@@ -175,15 +175,21 @@ export default function IzipaySDKForm({
       window.izi = izi;
 
       const callbackResponsePayment = (response: any) => {
+        console.log('--- CALLBACK INICIADO ---');
         console.log('Respuesta de Izipay:', response);
-        const orderStatus = response.orderStatus;
+        const responseCode = response.code;
 
-        if (orderStatus === 'PAID') {
-          window.location.href = `/success?orderId=${orderId}`;
-        } else if (orderStatus === 'ERROR') {
-          window.location.href = '/pago-rechazado';
-        } else if (orderStatus === 'CANCELLED') {
-          window.location.href = '/pago-cancelado';
+        if (responseCode === '00') {
+          console.log('¡PAGO EXITOSO! Llamando a onSuccess()...');
+          if (onSuccess) {
+            onSuccess(); // Llama al prop onSuccess
+          }
+        } else {
+          const errorMessage = `Código: ${responseCode}, Mensaje: ${response.message}`;
+          console.log(`Pago fallido o cancelado. ${errorMessage}`);
+          if (onError) {
+            onError(errorMessage); // Llama al prop onError
+          }
         }
       };
 

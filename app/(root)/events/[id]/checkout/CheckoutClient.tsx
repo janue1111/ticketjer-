@@ -1,17 +1,21 @@
 'use client'
 
+import { useRouter } from "next/navigation";
 import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { IEvent } from "@/lib/database/models/event.model";
 import { checkoutOrder } from "@/lib/actions/order.actions";
 import { Input } from "@/components/ui/input";
 import IzipayForm from "@/components/shared/IzipayForm";
+import IzipaySDKForm from "@/components/shared/IzipaySDKForm";
 import { useUser } from "@clerk/nextjs";
 
 const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) => {
   const { user } = useUser();
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [izipayParams, setIzipayParams] = useState<{[key: string]: string | number} | null>(null);
+  const [useNewIzipaySDK, setUseNewIzipaySDK] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
@@ -60,10 +64,10 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
       } else if (Culqi.error) {
         console.error('Error de Culqi:', Culqi.error);
         setPaymentError(Culqi.error.user_message || 'Ocurrió un error con Culqi.');
-        setIsProcessing(false); // <-- Added this line
+        setIsProcessing(false);
       } else {
         // User simply closed the modal
-        setIsProcessing(false); // <-- Added this line
+        setIsProcessing(false);
       }
     };
 
@@ -99,11 +103,16 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
     }
   };
 
+  const handleIzipaySDKCheckout = () => {
+    // Activar el uso del nuevo SDK de Izipay
+    setUseNewIzipaySDK(true);
+  };
+
   const handleCulqiPayment = async () => {
     setIsProcessing(true);
     setPaymentError(null);
     try {
-      // --- PASO 1: Crear la Orden en nuestro backend ---
+      // --- PASO 1: Crear la Orden en nuestro backend --- 
       const orderResponse = await fetch('/api/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -163,8 +172,34 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
     }
   };
 
+
+
   if (izipayParams) {
     return <IzipayForm params={izipayParams} izipayUrl={process.env.NEXT_PUBLIC_IZIPAY_URL!} />;
+  }
+
+  if (useNewIzipaySDK) {
+    return (
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-4">Pago con Izipay</h3>
+        <IzipaySDKForm
+          eventId={event._id}
+          eventName={event.title}
+          amount={lowestPrice ?? 0}
+          buyerId={userId}
+          buyerName={`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Cliente'}
+          buyerEmail={user?.emailAddresses[0]?.emailAddress || ''}
+          onSuccess={() => {
+            console.log('CheckoutClient: onSuccess ¡Redirigiendo a /success!');
+            router.push('/success');
+          }}
+          onError={(error: string) => {
+            console.error('CheckoutClient: onError', error);
+            router.push('/pago-rechazado');
+          }}
+        />
+      </div>
+    );
   }
 
   return (
@@ -184,14 +219,26 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
         <Button
           onClick={() => {
             handleBeginCheckoutClick();
-            handleIzipayCheckout();
+            handleIzipaySDKCheckout();
           }}
           role="link"
           size="lg"
           className="button w-full sm:w-fit rounded-full bg-red-600 hover:bg-red-700 text-white"
           disabled={isProcessing}
         >
-          Pagar con Izipay
+          Pagar con Izipay (SDK)
+        </Button>
+        <Button
+          onClick={() => {
+            handleBeginCheckoutClick();
+            handleIzipayCheckout();
+          }}
+          role="link"
+          size="lg"
+          className="button w-full sm:w-fit rounded-full bg-orange-600 hover:bg-orange-700 text-white"
+          disabled={isProcessing}
+        >
+          Pagar con Izipay (Legacy)
         </Button>
         <Button
           id="culqi-payment-button"

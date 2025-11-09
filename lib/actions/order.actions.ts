@@ -147,12 +147,13 @@ export const createOrder = async (order: CreateOrderParams) => {
     await connectToDatabase();
     
     const newOrder = await Order.create({
-      stripeId: order.stripeId,
+      transactionId: order.transactionId,
       totalAmount: order.totalAmount,
       event: order.eventId,
       buyer: order.buyerId,
       quantity: order.quantity,
       createdAt: order.createdAt,
+      status: order.status || 'pending',
     });
 
     return JSON.parse(JSON.stringify(newOrder));
@@ -217,10 +218,16 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
   }
 }
 
-export async function updateOrderStatus(orderId: string, newStatus: string) {
+export async function updateOrderStatus(orderId: string, newStatus: string, transactionId?: string) {
   try {
     await connectToDatabase();
-    const updatedOrder = await Order.findByIdAndUpdate(orderId, { status: newStatus }, { new: true });
+
+    const updateData: { status: string, transactionId?: string } = { status: newStatus };
+    if (transactionId) {
+      updateData.transactionId = transactionId;
+    }
+
+    const updatedOrder = await Order.findByIdAndUpdate(orderId, updateData, { new: true });
     if (!updatedOrder) throw new Error('Order not found');
     return JSON.parse(JSON.stringify(updatedOrder));
   } catch (error) {
@@ -262,8 +269,14 @@ export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUs
   try {
     await connectToDatabase()
 
+    // Buscar el usuario por clerkId para obtener su _id de MongoDB
+    const user = await User.findOne({ clerkId: userId })
+    if (!user) {
+      return { data: [], totalPages: 0 }
+    }
+
     const skipAmount = (Number(page) - 1) * limit
-    const conditions = { buyer: userId }
+    const conditions = { buyer: user._id }
 
     const orders = await Order.find(conditions)
       .sort({ createdAt: 'desc' })

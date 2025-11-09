@@ -10,18 +10,16 @@ import React from 'react'
 
 const ProfilePage = async ({searchParams}: SearchParamProps) => {
     const resolvedSearchParams = (await searchParams) ?? {}
-    const {sessionClaims } = await auth();
-    const userId = sessionClaims?.userId as string;
+    const { userId } = await auth();
 
     const ordersPage = Number(resolvedSearchParams?.ordersPage) || 1;
 
     const eventsPage = Number(resolvedSearchParams?.eventsPage) || 1;
 
-    const orders = await getOrdersByUser({userId,page:1})
-
+    // Verificar que userId exista antes de hacer las llamadas
+    const orders = userId ? await getOrdersByUser({userId, page:1}) : {data: [], totalPages: 0};
     const orderedEvents = orders?.data || [];
-
-    const organizedEvents  = await getEventsByUser({userId,page:1})
+    const organizedEvents = userId ? await getEventsByUser({userId, page:1}) : {data: [], totalPages: 0};
 
     console.log({orderedEvents})
   return (

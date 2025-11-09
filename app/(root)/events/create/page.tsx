@@ -1,12 +1,11 @@
 import EventForm from "@/components/shared/EventForm";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 const CreateEvent = async () => {
-  const {sessionClaims} = await auth();
+  const { userId } = await auth();
 
-  const userId = sessionClaims?.userId as string;
-
-  // console.log(userId);
+  if (!userId) redirect("/sign-in");
 
   return (
     <>

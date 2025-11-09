@@ -4,7 +4,7 @@ import { IEvent } from './event.model'
 export interface IOrder extends Document {
   _id: string;
   createdAt: Date
-  stripeId: string
+  transactionId: string
   totalAmount: string
   event: IEvent
   buyer: {
@@ -30,7 +30,7 @@ const OrderSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  stripeId: {
+  transactionId: {
     type: String,
     required: true,
     unique: true,

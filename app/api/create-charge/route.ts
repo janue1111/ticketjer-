@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     // 3. Guarda la orden en tu base de datos
     if (charge) {
       const newOrder = await createOrder({
-        stripeId: charge.id,
+        transactionId: charge.id,
         eventId: eventId,
         buyerId: buyerId,
         totalAmount: (charge.amount / 100).toString(),
