@@ -138,9 +138,10 @@ export default function IzipaySDKForm({
             orderNumber: orderNumber,
             currency: process.env.NEXT_PUBLIC_IZIPAY_CURRENCY || 'PEN',
             amount: amount.toFixed(2),
+            payMethod: "CARD,QR,YAPE_CODE,PAGO_PUSH" ,
             processType: 'AT',
             merchantBuyerId: buyerId || 'buyer_' + Date.now(),
-            dateTimeTransaction: Date.now().toString(),
+            dateTimeTransaction: (Date.now().toString() + '000'),
           },
 
           card: {
