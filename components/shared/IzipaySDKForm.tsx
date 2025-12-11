@@ -152,7 +152,7 @@ export default function IzipaySDKForm({
             container: '#izipay-payment-form',
           },
           urlRedirect: `${process.env.NEXT_PUBLIC_SERVER_URL}/orders`,
-          urlIPN: 'https://webhook.site/62ceb36e-b30a-49f9-88ba-298cdb33741b',
+          urlIPN: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/webhook/izipay`,
           appearance: {
             logo: 'https://demo-izipay.azureedge.net/test/img/millasb.svg',
           },
