@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { BillingDetails } from './BillingForm'; // Importar el tipo
 
 interface IzipaySDKFormProps {
   eventId: string;
   eventName: string;
   amount: number;
   buyerId: string;
-  buyerName: string;
-  buyerEmail: string;
+  billingDetails: BillingDetails; // Nueva prop
   onSuccess?: () => void;
   onError?: (error: string) => void;
 }
@@ -25,8 +25,7 @@ export default function IzipaySDKForm({
   eventName,
   amount,
   buyerId,
-  buyerName,
-  buyerEmail,
+  billingDetails, // Usar la nueva prop
   onSuccess,
   onError
 }: IzipaySDKFormProps) {
@@ -36,29 +35,21 @@ export default function IzipaySDKForm({
 
   // Función para generar un orderNumber válido
   const generateValidOrderNumber = (baseId: string): string => {
-    // Asegurarnos de que el orderNumber tenga entre 5 y 15 caracteres
-    let cleanId = baseId.replace(/[^a-zA-Z0-9]/g, ''); // Eliminar caracteres no alfanuméricos
-    
-    // Crear un orderNumber con prefijo "ORD" y solo los primeros caracteres necesarios del ID
-    let orderNumber = "ORD" + cleanId.substring(0, 12); // "ORD" + 12 caracteres = 15 caracteres máximo
-    
-    // Asegurarnos de que tenga al menos 5 caracteres
+    let cleanId = baseId.replace(/[^a-zA-Z0-9]/g, '');
+    let orderNumber = "ORD" + cleanId.substring(0, 12);
     if (orderNumber.length < 5) {
       orderNumber = orderNumber.padEnd(5, '0');
     }
-    
-    // Asegurarnos de que no exceda 15 caracteres
     if (orderNumber.length > 15) {
       orderNumber = orderNumber.substring(0, 15);
     }
-    
     return orderNumber;
   };
 
   // Cargar el script del SDK de Izipay
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://sandbox-checkout.izipay.pe/payments/v1/js/index.js'; // Script del ejemplo
+    script.src = 'https://sandbox-checkout.izipay.pe/payments/v1/js/index.js';
     script.async = true;
     script.onload = () => {
       setIsScriptLoaded(true);
@@ -115,7 +106,6 @@ export default function IzipaySDKForm({
     setError(null);
 
     try {
-      // Preparar orden y obtener token de sesión
       const sessionData = await prepareOrderAndGetToken();
       
       if (!sessionData) {
@@ -124,14 +114,10 @@ export default function IzipaySDKForm({
 
       const { sessionToken, orderNumber, izipayTransactionId } = sessionData;
 
-      const nameParts = buyerName.split(' ');
-      const firstName = nameParts[0] || 'Cliente';
-      const lastName = nameParts.slice(1).join(' ') || 'TicketiHub';
-
       const iziConfig = {
         publicKey: process.env.NEXT_PUBLIC_IZIPAY_PUBLIC_KEY || 'VErethUtraQuxas57wuMuquprADrAHAb',
         config: {
-          transactionId: izipayTransactionId, // USAR EL MISMO ID DE LA API
+          transactionId: izipayTransactionId,
           action: 'pay',
           merchantCode: process.env.NEXT_PUBLIC_IZIPAY_MERCHANT_CODE || '4004353',
           order: {
@@ -143,28 +129,30 @@ export default function IzipaySDKForm({
             merchantBuyerId: buyerId || 'buyer_' + Date.now(),
             dateTimeTransaction: (Date.now().toString() + '000'),
           },
-
           card: {
             brand: "",
             pan: "",
           },
-                billing: {
-                  firstName: firstName, // Tu variable
-                  lastName: lastName, // Tu variable
-                  email: buyerEmail.trim(), // Tu variable
-                  phoneNumber: '943541279',
-                  street: 'calle de pruebas',
-                  city: 'lima',
-                  state: 'lima',
-                  country: 'PE',
-                  postalCode: '00001',
-                  document: '70155398',
-                  documentType: 'DNI',
-                },          render: {
+          // Objeto de facturación ahora es completamente dinámico
+          billing: {
+            firstName: billingDetails.firstName,
+            lastName: billingDetails.lastName,
+            email: billingDetails.email.trim(),
+            phoneNumber: billingDetails.phoneNumber,
+            street: billingDetails.street,
+            city: billingDetails.city,
+            state: billingDetails.state,
+            country: billingDetails.country,
+            postalCode: billingDetails.postalCode,
+            document: billingDetails.document,
+            documentType: billingDetails.documentType,
+          },
+          render: {
             typeForm: window.Izipay.enums.typeForm.POP_UP,
             container: '#izipay-payment-form',
           },
           urlRedirect: `${process.env.NEXT_PUBLIC_SERVER_URL}/orders`,
+          urlIPN: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/webhook/izipay`,
           appearance: {
             logo: 'https://demo-izipay.azureedge.net/test/img/millasb.svg',
           },

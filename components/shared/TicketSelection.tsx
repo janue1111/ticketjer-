@@ -77,7 +77,7 @@ const TicketSelection = ({ event }: TicketSelectionProps) => {
 
     const order = {
       eventTitle: event.title,
-      eventId: event._id,
+      eventId: event._id.toString(),
       price: selectedTier.price,
       isFree: Number(selectedTier.price) === 0,
       buyerId,

@@ -2,7 +2,7 @@ import { Schema, model, models, Document } from 'mongoose'
 import { IEvent } from './event.model'
 
 export interface IOrder extends Document {
-  _id: string;
+
   createdAt: Date
   transactionId: string
   totalAmount: string

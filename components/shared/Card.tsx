@@ -76,7 +76,7 @@ type CardProps = {
               <Link href={`/events/${event._id}/update`}>
                 <Image src="/assets/icons/edit.svg" width={20} height={20} alt="edit" />
               </Link>
-              <DeleteConfirmation eventId={event._id} />
+              <DeleteConfirmation eventId={event._id.toString()} />
             </div>
           )}
         </div>
