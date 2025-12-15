@@ -53,11 +53,11 @@ export default function IzipaySDKForm({
     script.async = true;
     script.onload = () => {
       setIsScriptLoaded(true);
-      console.log('SDK de Izipay cargado correctamente');
+      console.log('DEBUG: SDK de Izipay cargado correctamente.');
     };
     script.onerror = () => {
       setError('Error al cargar el SDK de Izipay');
-      console.error('Error al cargar el SDK de Izipay');
+      console.error('DEBUG: Error al cargar el SDK de Izipay.');
     };
     document.body.appendChild(script);
 
@@ -69,6 +69,7 @@ export default function IzipaySDKForm({
   // Función para obtener el token de sesión y preparar la orden
   const prepareOrderAndGetToken = async (): Promise<{ sessionToken: string; orderNumber: string; izipayTransactionId: string } | null> => {
     try {
+      console.log('DEBUG: Iniciando prepareOrderAndGetToken...');
       const response = await fetch('/api/prepare-order', {
         method: 'POST',
         headers: {
@@ -77,7 +78,7 @@ export default function IzipaySDKForm({
         body: JSON.stringify({
           eventId: eventId,
           buyerId: buyerId,
-          quantity: 1, // Asumimos cantidad 1 por ahora, esto debería ser un prop
+          quantity: 1,
           totalAmount: amount.toString(),
         }),
       });
@@ -88,17 +89,20 @@ export default function IzipaySDKForm({
       }
 
       const data = await response.json();
+      console.log('DEBUG: Orden preparada exitosamente.', data);
       return { sessionToken: data.sessionToken, orderNumber: data.orderNumber, izipayTransactionId: data.izipayTransactionId };
     } catch (err) {
-      console.error('Error en prepareOrderAndGetToken:', err);
+      console.error('DEBUG: Error en prepareOrderAndGetToken:', err);
       throw err;
     }
   };
 
   // Función para inicializar el formulario de Izipay
   const initializeIzipayForm = async () => {
+    console.log('DEBUG: 1. Iniciando initializeIzipayForm...');
     if (!isScriptLoaded) {
       setError('SDK de Izipay no cargado');
+      console.error('DEBUG: initializeIzipayForm falló porque el SDK no está cargado.');
       return;
     }
 
@@ -106,12 +110,14 @@ export default function IzipaySDKForm({
     setError(null);
 
     try {
+      console.log('DEBUG: 2. Obteniendo token de sesión...');
       const sessionData = await prepareOrderAndGetToken();
       
       if (!sessionData) {
         throw new Error('No se pudo obtener el token de sesión');
       }
-
+      
+      console.log('DEBUG: 3. Token de sesión obtenido:', sessionData);
       const { sessionToken, orderNumber, izipayTransactionId } = sessionData;
 
       const iziConfig = {
@@ -133,7 +139,6 @@ export default function IzipaySDKForm({
             brand: "",
             pan: "",
           },
-          // Objeto de facturación ahora es completamente dinámico
           billing: {
             firstName: billingDetails.firstName,
             lastName: billingDetails.lastName,
@@ -151,49 +156,53 @@ export default function IzipaySDKForm({
             typeForm: window.Izipay.enums.typeForm.POP_UP,
             container: '#izipay-payment-form',
           },
-          urlRedirect: `${process.env.NEXT_PUBLIC_SERVER_URL}/orders`,
-          // urlIPN: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/ping`,
           appearance: {
             logo: 'https://demo-izipay.azureedge.net/test/img/millasb.svg',
           },
         },
       };
 
-      console.log("Izipay Config:", JSON.stringify(iziConfig, null, 2));
+      console.log("DEBUG: 4. Configuración de Izipay preparada:", JSON.stringify(iziConfig, null, 2));
       const izi = new window.Izipay(iziConfig);
       window.izi = izi;
 
       const callbackResponsePayment = (response: any) => {
-        console.log('--- CALLBACK INICIADO ---');
-        console.log('Respuesta de Izipay:', response);
+        console.log('--- DEBUG: [INICIO] CALLBACK DE IZIPAY INVOCADO ---');
+        console.log('--- DEBUG: RESPUESTA COMPLETA DE IZIPAY:', JSON.stringify(response, null, 2));
+        
         const responseCode = response.code;
+        const transactionId = response.transactionId;
 
-        if (responseCode === '00') {
-          console.log('¡PAGO EXITOSO! Llamando a onSuccess()...');
-          if (onSuccess) {
-            onSuccess(); // Llama al prop onSuccess
-          }
+        if (responseCode === '00' && transactionId) {
+          console.log(`--- DEBUG: ¡PAGO EXITOSO! Código: ${responseCode}, TransactionID: ${transactionId}. Redirigiendo...`);
+          setTimeout(() => {
+            window.location.href = `/success?transactionId=${transactionId}`;
+          }, 50);
         } else {
-          const errorMessage = `Código: ${responseCode}, Mensaje: ${response.message}`;
-          console.log(`Pago fallido o cancelado. ${errorMessage}`);
+          const errorMessage = `Código: ${responseCode}, Mensaje: ${response.message}, TransactionID: ${transactionId}`;
+          console.error(`--- DEBUG: Pago fallido, cancelado o respuesta inesperada. ${errorMessage}`);
           if (onError) {
-            onError(errorMessage); // Llama al prop onError
+            onError(errorMessage);
+
           }
+          alert(`El pago no pudo ser completado. Razón: ${response.message || 'Error desconocido'}. Por favor, intente de nuevo.`);
         }
+        console.log('--- DEBUG: [FIN] CALLBACK DE IZIPAY ---');
       };
 
       if (izi && typeof izi.LoadForm === 'function') {
+        console.log('DEBUG: 5. Llamando a izi.LoadForm()...');
         izi.LoadForm({
           authorization: sessionToken,
           keyRSA: process.env.NEXT_PUBLIC_IZIPAY_RSA_KEY,
           callbackResponse: callbackResponsePayment
         });
       } else {
-        throw new Error('No se pudo inicializar el formulario de Izipay');
+        throw new Error('No se pudo inicializar el formulario de Izipay (izi.LoadForm no es una función)');
       }
 
     } catch (err) {
-      console.error('Error al inicializar Izipay:', err);
+      console.error('DEBUG: Error final en initializeIzipayForm:', err);
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido al procesar el pago';
       setError(errorMessage);
       onError?.(errorMessage);
@@ -204,6 +213,7 @@ export default function IzipaySDKForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('DEBUG: Botón de pago presionado. Llamando a initializeIzipayForm...');
     await initializeIzipayForm();
   };
 
