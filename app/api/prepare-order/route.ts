@@ -15,14 +15,21 @@ export async function POST(request: Request) {
   try {
     const { eventId, buyerId, quantity, totalAmount }: PrepareOrderRequest = await request.json();
 
-    // 1. Crear la orden en la base de datos con estado 'pendiente'
-    const tempTransactionId = new (require('mongodb').ObjectId)().toString();
+    // 1. Generar un ID de transacción único que se usará en ambos sistemas, respetando el límite de 15 caracteres de Izipay.
+    const transactionId = `TXN${new (require('mongodb').ObjectId)().toString().slice(0, 12)}`;
+
+    // LOG DE DIAGNÓSTICO PARA CONFIRMACIÓN
+    console.log(`\n--- PRUEBA DE DIAGNÓSTICO ---`);
+    console.log(`DEBUG: ID generado y guardado en BD (NUESTRO_ID): ${transactionId}`);
+    console.log(`-----------------------------\n`);
+
+    // 2. Crear la orden en la base de datos con estado 'pendiente' y el ID de transacción final
     const newOrder: IOrder = await createOrder({
       eventId,
       buyerId,
       quantity,
       totalAmount,
-      transactionId: tempTransactionId, // Usamos un ID único temporal
+      transactionId: transactionId, // Usamos el ID de transacción consistente
       createdAt: new Date(),
       status: 'pending',
     });
@@ -30,25 +37,16 @@ export async function POST(request: Request) {
     if (!newOrder) {
       throw new Error('No se pudo crear la orden en la base de datos.');
     }
-
-    const orderId = newOrder._id;
-
-    // 2. Preparar la solicitud para generar el token de sesión de Izipay
-    const transactionId = `TXN${Date.now()}`; // Un ID de transacción único para la llamada a la API
-
+    
+    // 3. Preparar la solicitud para generar el token de sesión de Izipay
     const merchantCode = process.env.IZIPAY_MERCHANT_CODE || '4004353';
     const publicKey = process.env.IZIPAY_PUBLIC_KEY || 'VErethUtraQuxas57wuMuquprADrAHAb';
-    const apiUrl = 'https://sandbox-api-pw.izipay.pe/security/v1/Token/Generate';
-
-    // Acción de Corrección: Usar el monto en la unidad base (ej. "10.00")
     const amountAsNumber = parseFloat(totalAmount);
-
-    const truncatedOrderNumber = orderId.toString().slice(-15);
 
     const izipayRequestBody = {
       requestSource: "ECOMMERCE",
       merchantCode: merchantCode,
-      orderNumber: truncatedOrderNumber, // Usamos nuestro ID de orden como orderNumber
+      orderNumber: transactionId, // Usamos nuestro ID de transacción como orderNumber para consistencia
       publicKey: publicKey,
       amount: amountAsNumber.toFixed(2),
     };
@@ -100,8 +98,8 @@ export async function POST(request: Request) {
     // 4. Devolver el token de sesión y el ID de la transacción de Izipay al frontend
     return NextResponse.json({
       sessionToken: izipayResponse.response.token,
-      izipayTransactionId: transactionId,
-      orderNumber: truncatedOrderNumber,
+      izipayTransactionId: transactionId, // Usar el ID consistente
+      orderNumber: transactionId, // Usar el ID consistente
     }, { status: 200 });
 
   } catch (error) {
