@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { updateOrderByTransactionId } from '@/lib/actions/order.actions';
+import { updateOrderByTransactionId } from '@/lib/actions';
 
 const SuccessPage = () => {
   const searchParams = useSearchParams();
