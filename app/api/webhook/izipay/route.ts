@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createHmac } from 'crypto';
-import { updateOrderStatus } from '@/lib/actions/order.actions';
+import { updateOrderByTransactionId } from '@/lib/actions/order.actions';
 import { handleError } from '@/lib/utils';
 
 // La función de validación de firma permanece igual
@@ -49,36 +49,48 @@ async function processWebhook(req: NextRequest) {
 
     const payload = JSON.parse(payloadHttp);
     const paymentStatus = payload.code;
-    const orderDetails = payload.response?.order?.[0];
+    const transactionId = payload.transactionId; // transactionId está en el nivel superior del payload
 
-    if (!orderDetails) {
-      console.error("El payload no contiene detalles de la orden.");
+    if (!transactionId) {
+      console.error("El payload no contiene un transactionId.");
       return;
     }
 
-    const orderId = orderDetails.orderNumber;
-    const transactionId = payload.transactionId;
-
     if (paymentStatus === '00') {
-      console.log(`Pago exitoso para la orden ${orderId}. Actualizando estado a 'completed'.`);
-      await updateOrderStatus(orderId, 'completed', transactionId);
-      console.log(`Orden ${orderId} actualizada correctamente.`);
+      console.log(`IPN reporta pago exitoso para transactionId ${transactionId}. Actualizando estado a 'completed'.`);
+      const result = await updateOrderByTransactionId(transactionId);
+      if(result.success) {
+        console.log(`Orden con transactionId ${transactionId} actualizada correctamente via IPN.`);
+      } else {
+        console.error(`IPN: No se pudo actualizar la orden con transactionId ${transactionId}. Razón: ${result.error}`);
+      }
     } else {
-      console.log(`El pago para la orden ${orderId} no fue exitoso (código: ${paymentStatus}). Actualizando estado a 'failed'.`);
-      await updateOrderStatus(orderId, 'failed', transactionId);
+      console.log(`IPN reporta que el pago para transactionId ${transactionId} no fue exitoso (código: ${paymentStatus}). No se realizarán cambios en la orden.`);
     }
   } catch (error) {
-    // En un entorno serverless, es mejor solo loguear el error.
-    // La respuesta al cliente ya fue enviada.
     console.error('--- ERROR EN EL PROCESAMIENTO DEL WEBHOOK ---');
     handleError(error);
+    // Lanzamos el error para que la función que llama (POST) se entere del fallo.
+    throw error;
   }
 }
 
 export async function POST(req: NextRequest) {
-  // 1. Invocamos el procesamiento en segundo plano SIN 'await'
-  processWebhook(req);
+  try {
+    // Await para asegurar que el procesamiento se complete antes de responder.
+    await processWebhook(req);
+    
+    // Si llegamos aquí, processWebhook no lanzó errores.
+    console.log("LOG DE DIAGNÓSTICO: El procesamiento del webhook finalizó con éxito.");
+    return NextResponse.json({ message: 'Notificación procesada exitosamente.' }, { status: 200 });
 
-  // 2. Respondemos a Izipay INMEDIATAMENTE
-  return NextResponse.json({ message: 'Notificación recibida.' }, { status: 200 });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en el webhook.';
+    
+    // Logueamos el error exacto que fue lanzado desde processWebhook.
+    console.error(`LOG DE DIAGNÓSTICO: El procesamiento del webhook falló. Razón: ${errorMessage}`);
+    
+    // Devolvemos 500 para notificar a Izipay del fallo.
+    return NextResponse.json({ message: 'Error al procesar la notificación.', error: errorMessage }, { status: 500 });
+  }
 }
