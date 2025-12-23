@@ -112,13 +112,16 @@ export default function IzipaySDKForm({
     try {
       console.log('DEBUG: 2. Obteniendo token de sesión...');
       const sessionData = await prepareOrderAndGetToken();
-      
+
       if (!sessionData) {
         throw new Error('No se pudo obtener el token de sesión');
       }
-      
+
       console.log('DEBUG: 3. Token de sesión obtenido:', sessionData);
       const { sessionToken, orderNumber, izipayTransactionId } = sessionData;
+
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+      console.log('DEBUG: URL base configurada:', appUrl, '(Origen: ' + (process.env.NEXT_PUBLIC_APP_URL ? 'ENV' : 'window.location') + ')');
 
       const iziConfig = {
         publicKey: process.env.NEXT_PUBLIC_IZIPAY_PUBLIC_KEY || 'VErethUtraQuxas57wuMuquprADrAHAb',
@@ -130,12 +133,12 @@ export default function IzipaySDKForm({
             orderNumber: orderNumber,
             currency: process.env.NEXT_PUBLIC_IZIPAY_CURRENCY || 'PEN',
             amount: amount.toFixed(2),
-            payMethod: "CARD,QR,YAPE_CODE,PAGO_PUSH" ,
+            payMethod: "CARD,QR,YAPE_CODE,PAGO_PUSH",
             processType: 'AT',
             merchantBuyerId: buyerId || 'buyer_' + Date.now(),
             dateTimeTransaction: (Date.now().toString() + '000'),
           },
-          urlIPN: `${process.env.NEXT_PUBLIC_WEBHOOK_URL}/api/webhook/izipay`,
+          urlIPN: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/api/webhook/izipay`,
           card: {
             brand: "",
             pan: "",
@@ -170,7 +173,7 @@ export default function IzipaySDKForm({
       const callbackResponsePayment = (response: any) => {
         console.log('--- DEBUG: [INICIO] CALLBACK DE IZIPAY INVOCADO ---');
         console.log('--- DEBUG: RESPUESTA COMPLETA DE IZIPAY:', JSON.stringify(response, null, 2));
-        
+
         const responseCode = response.code;
         const transactionId = response.transactionId;
 
@@ -226,7 +229,7 @@ export default function IzipaySDKForm({
           <span className="block sm:inline">{error}</span>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <button
           type="submit"

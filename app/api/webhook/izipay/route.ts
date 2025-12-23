@@ -1,96 +1,102 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHmac } from 'crypto';
 import { updateOrderByTransactionId } from '@/lib/actions/order.actions';
 import { handleError } from '@/lib/utils';
+import querystring from 'querystring';
 
-// La función de validación de firma permanece igual
-function checkSignature(payload: string, keyHash: string, signature: string): boolean {
-  if (!keyHash) {
-    console.error("Error: La clave secreta (keyHash) no está configurada.");
-    return false;
-  }
-  const hmac = createHmac('sha256', Buffer.from(keyHash, 'utf-8'));
-  const messageBytes = Buffer.from(payload, 'utf-8');
-  const hash = hmac.update(messageBytes).digest('base64');
-  return signature === hash;
+/**
+ * Endpoint de verificación para confirmar que la ruta está activa.
+ */
+export async function GET() {
+  const timestamp = new Date().toISOString();
+  console.log(`✅ [IPN] Verificación de estado (GET) exitosa en: ${timestamp}`);
+  return NextResponse.json({
+    status: 'ok',
+    timestamp: timestamp
+  });
 }
 
-// Nueva función que contiene toda la lógica de procesamiento
-async function processWebhook(req: NextRequest) {
+/**
+ * Endpoint principal para recibir las Notificaciones de Pago Instantáneo (IPN) de Izipay.
+ */
+export async function POST(req: NextRequest) {
+  // =================================================================================
+  // LOG DE DIAGNÓSTICO EXTREMO
+  // Este es el primer log. Si no ves esto, la petición POST nunca llegó aquí.
+  console.log(`🚨🚨🚨 [IPN] MÉTODO POST INVOCADO - ${new Date().toISOString()} 🚨🚨🚨`);
+  // =================================================================================
+
+  const startTime = new Date();
+  
   try {
-    const izipayResponse = await req.json();
+    const contentType = req.headers.get('content-type') || '';
+    let data: any;
 
-    console.log('--- Notificación IPN de Izipay Recibida ---');
-    console.log('Cuerpo de la respuesta:', JSON.stringify(izipayResponse, null, 2));
-
-    const { payloadHttp, signature, code: responseCode } = izipayResponse;
-
-    if (responseCode === '021' || responseCode === 'COMMUNICATION_ERROR') {
-      console.log(`Respuesta IPN ignorada debido a código de error: ${responseCode}`);
-      return; // Termina la ejecución para este caso
+    // 1. Leer el payload
+    if (contentType.includes('application/json')) {
+      data = await req.json();
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      const text = await req.text();
+      data = querystring.parse(text);
+    } else {
+      console.error(`❌ [IPN] Content-Type no soportado: ${contentType}`);
+      return NextResponse.json({ error: 'Content-Type no soportado' }, { status: 200 });
     }
 
-    const secretKey = process.env.IZIPAY_HASH_KEY;
-    if (!secretKey) {
-      console.error("IZIPAY_HASH_KEY no está configurada en las variables de entorno.");
-      return;
-    }
+    console.log('📦 [IPN] Payload recibido:', JSON.stringify(data, null, 2));
 
-    const isSignatureValid = checkSignature(payloadHttp, secretKey, signature);
+    // 2. Extraer parámetros clave
+    const { transactionId, code, statusMessage } = data;
 
-    if (!isSignatureValid) {
-      console.error('Error: ¡La firma de la notificación IPN no es válida!');
-      // A diferencia de antes, no devolvemos un 400. Solo lo logueamos y terminamos.
-      // Devolver un error haría que Izipay reintente, lo cual no queremos si la firma es mala.
-      return; 
-    }
-
-    console.log('¡La firma de la notificación IPN es válida!');
-
-    const payload = JSON.parse(payloadHttp);
-    const paymentStatus = payload.code;
-    const transactionId = payload.transactionId; // transactionId está en el nivel superior del payload
-
+    // 3. Validar que existe un ID de transacción
     if (!transactionId) {
-      console.error("El payload no contiene un transactionId.");
-      return;
+      console.error('❌ [IPN] El payload no contiene un "transactionId".');
+      return NextResponse.json({ error: 'Payload no contiene transactionId' }, { status: 200 });
     }
+     console.log(`➡️ [IPN] Procesando transacción: ${transactionId}`);
 
-    if (paymentStatus === '00') {
-      console.log(`IPN reporta pago exitoso para transactionId ${transactionId}. Actualizando estado a 'completed'.`);
+    // 4. Determinar si el pago fue exitoso
+    const isSuccess = code === '00';
+    
+    console.log(`ℹ️ [IPN] Estado del pago para ${transactionId}: ${isSuccess ? 'Exitoso' : 'No Exitoso'} (Código: ${code}, Mensaje: "${statusMessage}")`);
+
+    // 5. Procesar la orden
+    if (isSuccess) {
+      console.log(`⏳ [IPN] Actualizando orden para la transacción ${transactionId}...`);
       const result = await updateOrderByTransactionId(transactionId);
-      if(result.success) {
-        console.log(`Orden con transactionId ${transactionId} actualizada correctamente via IPN.`);
+      
+      if (result.success) {
+        console.log(`✅ [IPN] Orden actualizada exitosamente para la transacción ${transactionId}.`);
       } else {
-        console.error(`IPN: No se pudo actualizar la orden con transactionId ${transactionId}. Razón: ${result.error}`);
+        console.error(`🚨 [IPN] ERROR DE LÓGICA: No se pudo actualizar la orden para la transacción ${transactionId}. Razón: ${result.error}`);
       }
     } else {
-      console.log(`IPN reporta que el pago para transactionId ${transactionId} no fue exitoso (código: ${paymentStatus}). No se realizarán cambios en la orden.`);
+      console.log(`ℹ️ [IPN] La transacción ${transactionId} no fue exitosa. No se realizarán cambios.`);
     }
+
+    // 6. Responder 200 OK
+    const endTime = new Date();
+    const duration = endTime.getTime() - startTime.getTime();
+    console.log(`✅ [IPN] Procesamiento finalizado para ${transactionId} en ${duration}ms. Respondiendo HTTP 200.`);
+    
+    return NextResponse.json({
+      success: true,
+      processed: isSuccess,
+      message: 'Notificación recibida y procesada.'
+    }, { status: 200 });
+
   } catch (error) {
-    console.error('--- ERROR EN EL PROCESAMIENTO DEL WEBHOOK ---');
+    // 7. Manejo de errores catastróficos
+    const endTime = new Date();
+    const duration = endTime.getTime() - startTime.getTime();
+    console.error(`🔥🔥🔥 [IPN] ERROR CATASTRÓFICO en el webhook. Duración: ${duration}ms.`);
     handleError(error);
-    // Lanzamos el error para que la función que llama (POST) se entere del fallo.
-    throw error;
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    // Await para asegurar que el procesamiento se complete antes de responder.
-    await processWebhook(req);
     
-    // Si llegamos aquí, processWebhook no lanzó errores.
-    console.log("LOG DE DIAGNÓSTICO: El procesamiento del webhook finalizó con éxito.");
-    return NextResponse.json({ message: 'Notificación procesada exitosamente.' }, { status: 200 });
-
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido en el webhook.';
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido.';
     
-    // Logueamos el error exacto que fue lanzado desde processWebhook.
-    console.error(`LOG DE DIAGNÓSTICO: El procesamiento del webhook falló. Razón: ${errorMessage}`);
-    
-    // Devolvemos 500 para notificar a Izipay del fallo.
-    return NextResponse.json({ message: 'Error al procesar la notificación.', error: errorMessage }, { status: 500 });
+    return NextResponse.json({
+      success: false,
+      error: errorMessage,
+      message: 'Error interno al procesar la notificación.'
+    }, { status: 200 });
   }
 }

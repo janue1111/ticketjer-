@@ -1,0 +1,44 @@
+<?php
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://sandbox-checkout.izipay.pe/payments/v1/js/index.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <title>Checkout</title>
+</head>
+
+<body>
+
+    <form action="">
+
+        <label for="">Nombre</label>
+        <input type="text" value="Juan" name="nom_cli" id="nom_cli"><br>
+
+        <label for="">Apellidos</label>
+        <input type="text" value="Quispe" name="ape_cli" id="ape_cli"><br>
+
+        <label for="">Email</label>
+        <input type="text" value="juan.quispe@izipay.pe" name="email_cli" id="email_cli"><br>
+
+        <label for="">Celular</label>
+        <input type="text" value="987654321" name="celular_cli" id="celular_cli"><br>
+
+        <label for="">DNI</label>
+        <input type="text" value="12457896" name="dni_cli" id="dni_cli"><br>
+
+        <label for="">Monto</label>
+        <input type="text" value="2.20" name="monto_cli" id="monto_cli">
+
+    </form>
+    <button id="btn_pagar">Pagar</button>
+   <!-- <button id="btnPayNow" class="buttonPay false" type="button" data-mode="pop-up" style="display: block;">Cargar checkout</button> -->
+</body>
+<script src="../config/js/functions.js"></script>
+
+</html>
