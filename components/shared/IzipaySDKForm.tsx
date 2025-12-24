@@ -138,7 +138,8 @@ export default function IzipaySDKForm({
             merchantBuyerId: buyerId || 'buyer_' + Date.now(),
             dateTimeTransaction: (Date.now().toString() + '000'),
           },
-          urlIPN: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/api/webhook/izipay`,
+          urlIPN: "https://webhook.site/d8360467-a27d-43fa-b7c8-3d38f399bf0e", // PRUEBA AISLAMIENTO
+          // Antes: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/api/webhook/izipay`,
           card: {
             brand: "",
             pan: "",
