@@ -49,7 +49,7 @@ export default function IzipaySDKForm({
   // Cargar el script del SDK de Izipay
   useEffect(() => {
     const script = document.createElement('script');
-    script.src = 'https://sandbox-checkout.izipay.pe/payments/v1/js/index.js';
+    script.src = 'https://checkout.izipay.pe/payments/v1/js/index.js';
     script.async = true;
     script.onload = () => {
       setIsScriptLoaded(true);

@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     if (!newOrder) {
       throw new Error('No se pudo crear la orden en la base de datos.');
     }
-    
+
     // 3. Preparar la solicitud para generar el token de sesión de Izipay
     const merchantCode = process.env.IZIPAY_MERCHANT_CODE || '4004353';
     const publicKey = process.env.IZIPAY_PUBLIC_KEY || 'VErethUtraQuxas57wuMuquprADrAHAb';
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     // 3. Realizar la llamada a la API de Izipay para obtener el token
     const postData = JSON.stringify(izipayRequestBody);
     const options = {
-      hostname: 'sandbox-api-pw.izipay.pe',
+      hostname: 'api-pw.izipay.pe',
       port: 443,
       path: '/security/v1/Token/Generate',
       method: 'POST',
