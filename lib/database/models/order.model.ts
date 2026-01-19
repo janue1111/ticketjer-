@@ -14,6 +14,8 @@ export interface IOrder extends Document {
   }
   quantity: number;
   status: string;
+  isUsed: boolean;
+  scannedAt?: Date;
 }
 
 export type IOrderItem = {
@@ -54,6 +56,13 @@ const OrderSchema = new Schema({
     type: String,
     required: true,
     default: 'pending',
+  },
+  isUsed: {
+    type: Boolean,
+    default: false,
+  },
+  scannedAt: {
+    type: Date,
   },
 })
 
