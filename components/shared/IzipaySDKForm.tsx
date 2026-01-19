@@ -183,12 +183,15 @@ export default function IzipaySDKForm({
           setTimeout(() => {
             window.location.href = `/success?transactionId=${transactionId}`;
           }, 50);
+        } else if (responseCode === '021') {
+          // Código 021: Cancelación por el usuario (cerró el modal). No es un error crítico.
+          console.warn(`--- INFO: Usuario canceló el pago. Código: ${responseCode}`);
+          // No llamamos a onError para evitar redirigir a page de error, solo dejamos que intente de nuevo.
         } else {
           const errorMessage = `Código: ${responseCode}, Mensaje: ${response.message}, TransactionID: ${transactionId}`;
           console.error(`--- DEBUG: Pago fallido, cancelado o respuesta inesperada. ${errorMessage}`);
           if (onError) {
             onError(errorMessage);
-
           }
           alert(`El pago no pudo ser completado. Razón: ${response.message || 'Error desconocido'}. Por favor, intente de nuevo.`);
         }
@@ -223,42 +226,104 @@ export default function IzipaySDKForm({
   };
 
   return (
-    <div className="izipay-form-container">
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-          <strong className="font-bold">Error: </strong>
-          <span className="block sm:inline">{error}</span>
+    <div className="izipay-form-container w-full max-w-md mx-auto">
+      {/* Card Container */}
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Finalizar Compra
+          </h2>
         </div>
-      )}
 
-      <form onSubmit={handleSubmit}>
-        <button
-          type="submit"
-          disabled={isLoading || !isScriptLoaded}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Procesando...
-            </span>
-          ) : (
-            `Pagar S/. ${amount.toFixed(2)} con Izipay`
-          )}
-        </button>
-      </form>
+        {/* Order Details */}
+        <div className="px-6 py-5 border-b border-gray-100">
+          <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-3">Resumen del Pedido</h3>
+
+          <div className="space-y-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="font-semibold text-gray-900 text-lg">{eventName}</p>
+                <p className="text-sm text-gray-500">1 entrada</p>
+              </div>
+            </div>
+
+            <div className="border-t border-dashed border-gray-200 pt-3 mt-3">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 font-medium">Total a pagar</span>
+                <span className="text-2xl font-bold text-gray-900">S/. {amount.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2" role="alert">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm">{error}</span>
+          </div>
+        )}
+
+        {/* Payment Button */}
+        <div className="px-6 py-5">
+          <form onSubmit={handleSubmit}>
+            <button
+              type="submit"
+              disabled={isLoading || !isScriptLoaded}
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none text-lg"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Procesando...
+                </span>
+              ) : !isScriptLoaded ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Cargando...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                  Pagar S/. {amount.toFixed(2)}
+                </span>
+              )}
+            </button>
+          </form>
+
+          {/* Trust Signals */}
+          <div className="mt-4 flex items-center justify-center gap-2 text-gray-500 text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+            </svg>
+            <span>Pago procesado de forma segura por <strong className="text-gray-700">Izipay</strong></span>
+          </div>
+
+          {/* Payment Methods */}
+          <div className="mt-4 flex items-center justify-center gap-3 opacity-60">
+            <img src="https://brand.mastercard.com/content/dam/mccom/brandcenter/thumbnails/mc_symbol_opt_73_1x.png" alt="Mastercard" className="h-6 object-contain" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" className="h-4 object-contain" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-5 object-contain" />
+          </div>
+        </div>
+      </div>
 
       {/* Contenedor para el formulario embebido de Izipay */}
       <div id="izipay-payment-form" className="mt-6"></div>
-
-      {!isScriptLoaded && (
-        <div className="mt-4 text-center text-gray-500">
-          Cargando SDK de Izipay...
-        </div>
-      )}
     </div>
   );
 }
