@@ -71,25 +71,25 @@ const Footer = () => {
           <div className="md:col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-blue-400">Síguenos</h3>
             <div className="flex flex-col space-y-2">
-              <Link 
-                href="https://www.facebook.com/profile.php?id=61573004905232" 
-                target="_blank" 
+              <Link
+                href="https://www.facebook.com/profile.php?id=61573004905232"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center gap-2"
               >
                 <span>📘</span> Facebook
               </Link>
-              <Link 
-                href="https://www.instagram.com/ticketsasoo/" 
-                target="_blank" 
+              <Link
+                href="https://www.instagram.com/ticketsasoo/"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-pink-400 transition-colors duration-200 flex items-center gap-2"
               >
                 <span>📷</span> Instagram
               </Link>
-              <Link 
-                href="https://www.youtube.com/@TICKETSASO" 
-                target="_blank" 
+              <Link
+                href="https://www.youtube.com/@TICKETSASO"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-red-400 transition-colors duration-200 flex items-center gap-2"
               >
@@ -103,7 +103,7 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-8 pt-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2025 TICKETJER. Todos los derechos reservados.
+              © 2025 TICKETSASO. Todos los derechos reservados.
             </p>
             <p className="text-gray-400 text-sm mt-2 md:mt-0">
               Hecho con ❤️ para los amantes de eventos

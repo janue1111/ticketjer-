@@ -11,8 +11,8 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Ticketjer',
-  description: 'Ticketjer te ayuda a comprar entradas de tus eventos favoritos.',
+  title: 'ticketsaso',
+  description: 'ticketsaso te ayuda a comprar entradas de tus eventos favoritos.',
   icons: {
     icon: '/assets/images/logoelbueno.jpg',
   }
@@ -25,10 +25,10 @@ export default function RootLayout({
 }) {
   return (
     <div className='flex h-screen flex-col'>
-        <Header/>
-        <main className='flex-1'>{children}</main>
-        <Footer/>
-    </div>  
-      
+      <Header />
+      <main className='flex-1'>{children}</main>
+      <Footer />
+    </div>
+
   )
 }

@@ -12,8 +12,8 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Ticketjer',
-  description: 'Ticketjer es una plataforma para la gestión de eventos.',
+  title: 'ticketsaso',
+  description: 'ticketsaso es una plataforma para la gestión de eventos.',
   icons: {
     icon: '/assets/images/logo.svg'
   }
