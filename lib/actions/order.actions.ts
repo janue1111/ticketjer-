@@ -8,7 +8,7 @@ import { handleError } from '../utils';
 import { connectToDatabase } from '../database';
 import Order from '../database/models/order.model';
 import Event from '../database/models/event.model';
-import {ObjectId} from 'mongodb';
+import { ObjectId } from 'mongodb';
 import User from '../database/models/user.model';
 
 /*export const checkoutOrder = async (order: CheckoutOrderParams) => {
@@ -46,6 +46,11 @@ import User from '../database/models/user.model';
   }
 }*/
 
+/* 
+DEPRECATED: Esta función usaba la implementación antigua de Izipay con vads_params.
+Ahora se usa IzipaySDKForm que implementa el SDK moderno de Izipay.
+Si necesitas referencia, mantén este código comentado.
+
 export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key: string]: string | number }> => {
   await connectToDatabase();
 
@@ -76,7 +81,7 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
   const vads_params: { [key: string]: string | number } = {
     vads_action_mode: 'INTERACTIVE',
     vads_amount: amount,
-    vads_ctx_mode: 'PRODUCTION', // O 'PRODUCTION' en producción
+    vads_ctx_mode: 'PRODUCTION',
     vads_currency: '604', // PEN
     vads_page_action: 'PAYMENT',
     vads_payment_config: 'SINGLE',
@@ -84,18 +89,15 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
     vads_trans_date: vads_trans_date,
     vads_trans_id: vads_trans_id,
     vads_version: 'V2',
-    vads_order_id: order.eventId, // Usamos eventId como identificador único de la orden
+    vads_order_id: order.eventId,
     vads_cust_email: buyerEmail,
-    vads_cust_id: order.buyerId, // <- AÑADIDO AQUI
-    // --- Campos de personalización ---
+    vads_cust_id: order.buyerId,
     vads_url_success: `${process.env.NEXT_PUBLIC_SERVER_URL}/success`,
     vads_url_refused: `${process.env.NEXT_PUBLIC_SERVER_URL}/pago-rechazado`,
     vads_url_cancel: `${process.env.NEXT_PUBLIC_SERVER_URL}/pago-cancelado`,
     vads_theme_config: 'SUCCESS_FOOTER_MSG_RETURN=DESCARGA TU TICKET',
   };
 
-  // --- Creación de la cadena para firmar ---
-  // Lista explícita y ordenada de los campos requeridos por Izipay para la firma.
   const signature_fields = [
     'vads_action_mode',
     'vads_amount',
@@ -116,19 +118,16 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
     'vads_version'
   ];
 
-  // Se recogen los valores de vads_params en el orden estricto de la lista anterior.
   const string_to_sign = signature_fields
     .map(key => {
       const value = vads_params[key];
       if (value === undefined || value === null) {
-        // Esto nos alertaría si un campo esperado no estuviera presente.
         throw new Error(`El campo requerido para la firma '${key}' no fue encontrado en vads_params.`);
       }
       return String(value);
     })
     .join('+');
 
-  // --- Cálculo de la firma (Método HMAC) ---
   const secretKey = process.env.IZIPAY_PROD_SECRET_KEY!;
   const data_to_hash = string_to_sign + '+' + secretKey;
 
@@ -141,11 +140,13 @@ export const checkoutOrder = async (order: CheckoutOrderParams): Promise<{ [key:
 
   return vads_params;
 }
+*/
+
 
 export const createOrder = async (order: CreateOrderParams) => {
   try {
     await connectToDatabase();
-    
+
     const newOrder = await Order.create({
       transactionId: order.transactionId,
       totalAmount: order.totalAmount,
@@ -311,7 +312,7 @@ export async function updateOrderByTransactionId(transactionId: string): Promise
       console.error(`Error en server action: Orden no encontrada con el ID de transacción: ${transactionId}`);
       return { success: false, order: null, error: 'Orden no encontrada con el ID de transacción proporcionado.' };
     }
-    
+
     // Si la orden ya está completada, simplemente la devolvemos con éxito.
     if (orderToUpdate.status === 'completed') {
       console.log(`Info en server action: La orden con ID de transacción ${transactionId} ya estaba completada.`);

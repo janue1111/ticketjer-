@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import { IEvent } from "@/lib/database/models/event.model"
 import { useUser } from '@clerk/nextjs'
-import { checkoutOrder } from '@/lib/actions/order.actions'
-import IzipayForm from './IzipayForm'
+import Link from 'next/link'
 
 interface ITier {
   name: string;
@@ -21,21 +20,10 @@ type TicketSelectionProps = {
 const TicketSelection = ({ event }: TicketSelectionProps) => {
   const activePhase = event.pricingPhases.find(phase => phase.active);
   const [selectedTier, setSelectedTier] = useState<ITier | null>(null);
-  const [izipayParams, setIzipayParams] = useState<{ [key: string]: string | number } | null>(null)
   const { user } = useUser()
 
   if (!activePhase) {
     return <div className="text-white text-center py-10 bg-neutral-700/80 rounded-2xl">Las entradas no están a la venta en este momento.</div>;
-  }
-
-  // Si ya tenemos los parámetros de Izipay, renderizamos el formulario auto-enviable
-  if (izipayParams) {
-    return (
-      <IzipayForm 
-        params={izipayParams} 
-        izipayUrl={process.env.NEXT_PUBLIC_IZIPAY_URL!}
-      />
-    )
   }
 
   const handleBeginCheckout = () => {
@@ -46,13 +34,13 @@ const TicketSelection = ({ event }: TicketSelectionProps) => {
     window.dataLayer.push({
       event: 'begin_checkout',
       currency: 'PEN',
-      value: unitPrice, // Quantity is 1
+      value: unitPrice,
       items: [
         {
           item_id: event._id,
           item_name: event.title,
           item_category: event.category?.name,
-          item_variant: selectedTier.name, // Add tier name as variant
+          item_variant: selectedTier.name,
           price: unitPrice,
           quantity: 1,
           ...(event.layoutType === 'immersive' && event.immersiveImages ? {
@@ -65,28 +53,6 @@ const TicketSelection = ({ event }: TicketSelectionProps) => {
       ],
     });
   };
-
-  const onCheckout = async () => {
-    if (!selectedTier) return
-
-    handleBeginCheckout();
-
-    // Obtenemos el userId mapeado a nuestra BD desde Clerk
-    const buyerId = (user?.publicMetadata as any)?.userId as string | undefined
-    if (!buyerId) return
-
-    const order = {
-      eventTitle: event.title,
-      eventId: event._id.toString(),
-      price: selectedTier.price,
-      isFree: Number(selectedTier.price) === 0,
-      buyerId,
-      quantity: 1,
-    }
-
-    const params = await checkoutOrder(order)
-    setIzipayParams(params)
-  }
 
   return (
     <div className="bg-neutral-800/80 backdrop-blur-sm border border-neutral-700/80 rounded-2xl p-6 text-white max-w-md mx-auto">
@@ -122,13 +88,13 @@ const TicketSelection = ({ event }: TicketSelectionProps) => {
         ))}
       </div>
 
-      <button 
-        className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-neutral-600 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 shadow-lg shadow-purple-600/20"
-        disabled={!selectedTier}
-        onClick={onCheckout}
+      <Link
+        href={`/events/${event._id}/checkout`}
+        onClick={handleBeginCheckout}
+        className={`block w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 shadow-lg shadow-purple-600/20 text-center ${!selectedTier ? 'pointer-events-none opacity-50 cursor-not-allowed' : ''}`}
       >
         COMPRAR AHORA
-      </button>
+      </Link>
     </div>
   )
 }

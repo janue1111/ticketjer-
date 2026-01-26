@@ -28,7 +28,7 @@ const Collection = ({
   return (
     <>
       {data.length > 0 ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="container mx-auto py-6 md:py-12">
           <div className="flex flex-col items-center gap-10">
             <ul className="grid w-full grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
               {data.map((item) => {
