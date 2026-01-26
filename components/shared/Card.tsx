@@ -62,11 +62,11 @@ const Card = ({ event, hasOrderLink, hidePrice, orderQuantity, orderId }: CardPr
       : `/events/${event._id}`;
 
   return (
-    <article className="w-full overflow-hidden bg-white border-[1.5px] border-neutral-100 relative h-full rounded-lg hover:shadow-lg transition-all duration-300 flex flex-col group">
+    <article className="w-full overflow-hidden bg-white border-2 border-neutral-300 relative h-full rounded-md hover:shadow-lg transition-all duration-300 flex flex-col group">
       <div className="relative p-2">
         <Link
           href={linkHref}
-          className="relative block z-1 w-full aspect-square overflow-hidden rounded-md bg-gray-100"
+          className="relative block z-1 w-full aspect-square overflow-hidden rounded bg-gray-100"
           onClick={handleViewItemClick}
         >
           {/* Imagen (adaptada a Next.js Image) */}

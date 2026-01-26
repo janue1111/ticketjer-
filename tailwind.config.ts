@@ -12,9 +12,13 @@ module.exports = withUt({
   theme: {
     container: {
       center: true,
-      padding: '2rem',
-      screens: {
-        '2xl': '1400px',
+      padding: {
+        DEFAULT: '0.5rem',
+        sm: '0.5rem',
+        md: '0rem',
+        lg: '0rem',
+        xl: '0rem',
+        '2xl': '0rem',
       },
     },
     extend: {
