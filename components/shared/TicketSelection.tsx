@@ -32,7 +32,7 @@ const TicketSelection = ({ event }: TicketSelectionProps) => {
     const unitPrice = Number(selectedTier.price) || 0;
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      event: 'begin_checkout',
+      event: 'add_to_cart',
       currency: 'PEN',
       value: unitPrice,
       items: [

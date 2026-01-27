@@ -43,6 +43,42 @@ const CheckoutClient = ({ event, userId }: { event: IEvent; userId: string }) =>
   };
 
   const handleBillingSubmit = (data: BillingDetails) => {
+    // Enviar evento de GA4 para add_shipping_info (Paso 2 completado)
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'add_shipping_info',
+      currency: 'PEN',
+      value: unitPrice * quantity,
+      items: [{
+        item_id: event._id,
+        item_name: event.title,
+        item_category: event.category?.name,
+        price: unitPrice,
+        quantity: quantity,
+      }],
+      shipping_tier: 'Digital Delivery',
+      // Datos del usuario del formulario
+      user_data: {
+        email: data.email,
+        phone_number: data.phoneNumber,
+        address: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          street: data.street,
+          city: data.city,
+          region: data.state,
+          postal_code: data.postalCode,
+          country: data.country,
+        },
+      },
+      // Datos adicionales personalizados
+      customer_info: {
+        document_type: data.documentType,
+        document_number: data.document,
+        full_name: `${data.firstName} ${data.lastName}`,
+      },
+    });
+
     setBillingDetails(data);
     setShowBillingForm(false); // Ocultar el formulario de facturación
   };

@@ -222,6 +222,22 @@ export default function IzipaySDKForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('DEBUG: Botón de pago presionado. Llamando a initializeIzipayForm...');
+
+    // Disparar evento de GA4 cuando el usuario hace clic en "Pagar"
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'add_payment_info',
+      currency: 'PEN',
+      value: amount,
+      payment_type: 'Izipay SDK',
+      items: [{
+        item_id: eventId,
+        item_name: eventName,
+        price: amount,
+        quantity: 1,
+      }],
+    });
+
     await initializeIzipayForm();
   };
 
