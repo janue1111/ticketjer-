@@ -316,15 +316,35 @@ export async function updateOrderByTransactionId(transactionId: string): Promise
     // Si la orden ya está completada, simplemente la devolvemos con éxito.
     if (orderToUpdate.status === 'completed') {
       console.log(`Info en server action: La orden con ID de transacción ${transactionId} ya estaba completada.`);
-      return { success: true, order: JSON.parse(JSON.stringify(orderToUpdate)), error: null };
+      // Obtener los datos completos con populate
+      const completeOrder = await Order.findById(orderToUpdate._id)
+        .populate({
+          path: 'event',
+          model: Event,
+        })
+        .populate({
+          path: 'buyer',
+          model: User,
+          select: '_id firstName lastName email username',
+        });
+      return { success: true, order: JSON.parse(JSON.stringify(completeOrder)), error: null };
     }
 
-    // Actualizar el estado de la orden a 'completed'
+    // Actualizar el estado de la orden a 'completed' y obtener datos completos
     const updatedOrder = await Order.findByIdAndUpdate(
       orderToUpdate._id,
       { status: 'completed' },
       { new: true }
-    );
+    )
+      .populate({
+        path: 'event',
+        model: Event,
+      })
+      .populate({
+        path: 'buyer',
+        model: User,
+        select: '_id firstName lastName email username',
+      });
 
     if (!updatedOrder) {
       console.error(`Error en server action: La orden con ID ${orderToUpdate._id} fue encontrada pero no pudo ser actualizada.`);

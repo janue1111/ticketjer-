@@ -5,6 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import { updateOrderByTransactionId } from '@/lib/actions';
 import QRCode from 'react-qr-code';
 
+// Declaración global para TypeScript
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
+
 const SuccessPage = () => {
   const searchParams = useSearchParams();
   const transactionId = searchParams.get('transactionId');
@@ -18,6 +26,40 @@ const SuccessPage = () => {
           const result = await updateOrderByTransactionId(transactionId);
           if (result.success) {
             setStatus('success');
+
+            // 🎉 Disparar evento purchase al DataLayer
+            // Estructura específica para Facebook Pixel y GTM
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+              event: 'purchase',
+              // IMPORTANTE: Datos en la raíz para facilitar GTM
+              transaction_id: transactionId, // ID único de Izipay (Vital para deduplicar)
+              value: result.order?.totalAmount || 0,
+              currency: 'PEN',
+
+              // Datos del Usuario (Vital para Facebook Advanced Matching)
+              user_data: {
+                email: result.order?.buyer?.email || '',
+                phone_number: result.order?.buyer?.phone || '', // Si lo tienes
+                address: {
+                  first_name: result.order?.buyer?.firstName || '',
+                  last_name: result.order?.buyer?.lastName || '',
+                  city: "Lima", // O el dato real si lo tienes
+                  country: "PE"
+                }
+              },
+
+              // Array de productos
+              items: [{
+                item_id: result.order?.event?._id || '',
+                item_name: result.order?.event?.title || 'Evento',
+                item_category: result.order?.event?.category?.name || "concierto", // O la categoría real
+                price: result.order?.totalAmount || 0,
+                quantity: result.order?.quantity || 1
+              }]
+            });
+
+            console.log('✅ Evento purchase enviado al DataLayer:', transactionId);
           } else {
             setStatus('error');
             setError(result.error || 'No se pudo confirmar la orden.');
