@@ -1,6 +1,5 @@
 "use client"
 
-import Image from 'next/image';
 import { useEffect, useState } from 'react'
 import { Input } from '../ui/input';
 import { formUrlQuery, removeKeysFromQuery } from '@/lib/utils';
@@ -15,7 +14,7 @@ const Search = ({ placeholder = 'Buscar título...' }: { placeholder?: string })
     const delayDebounceFn = setTimeout(() => {
       let newUrl = '';
 
-      if(query) {
+      if (query) {
         newUrl = formUrlQuery({
           params: searchParams.toString(),
           key: 'query',
@@ -35,13 +34,29 @@ const Search = ({ placeholder = 'Buscar título...' }: { placeholder?: string })
   }, [query, searchParams, router])
 
   return (
-    <div className="flex-center min-h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
-      <Image src="/assets/icons/search.svg" alt="search" width={24} height={24} />
-      <Input 
+    <div className="flex-center w-full overflow-hidden rounded-full bg-white px-4 py-2.5 border border-neutral-300 hover:border-neutral-400 transition-colors">
+      {/* Icono de búsqueda inline - negro sólido */}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="shrink-0 text-black"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <Input
         type="text"
         placeholder={placeholder}
         onChange={(e) => setQuery(e.target.value)}
-        className="p-regular-16 border-0 bg-grey-50 outline-offset-0 placeholder:text-grey-500 focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+        className="border-0 bg-white outline-offset-0 placeholder:text-neutral-700 placeholder:font-normal text-black font-medium focus:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-[15px]"
+        style={{ fontFamily: 'Arial, sans-serif' }}
       />
     </div>
   )

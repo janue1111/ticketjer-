@@ -1,11 +1,9 @@
 import HeroCarousel from '@/components/shared/HeroCarousel';
-import CategoryFilter from '@/components/shared/CategoryFilter';
 import Collection from '@/components/shared/Collection';
-import Search from '@/components/shared/Search';
 import { getAllEvents } from '@/lib/actions/event.actions';
 import { SearchParamProps } from '@/types';
-import Image from 'next/image';
-import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
 
 export default async function Home({ searchParams }: SearchParamProps) {
   const resolvedSearchParams = (await searchParams) ?? {};
@@ -26,11 +24,6 @@ export default async function Home({ searchParams }: SearchParamProps) {
 
       <section id="events" className="wrapper my-8 flex flex-col gap-8 md:gap-12">
         <h2 className="h2-bold">Eventos</h2>
-
-        <div className="flex w-full flex-col gap-5 md:flex-row">
-          <Search />
-          <CategoryFilter />
-        </div>
 
         <Collection
           data={events?.data}

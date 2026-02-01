@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+// Forzar rendering dinámico para evitar errores de build con componentes que usan useSearchParams
+export const dynamic = 'force-dynamic';
+
 const ContactanosPage = () => {
   return (
     <section className="py-8 wrapper flex flex-col gap-8 md:gap-12">

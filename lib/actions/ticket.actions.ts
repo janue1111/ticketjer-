@@ -1,17 +1,17 @@
 'use server';
 
 import { connectToDatabase } from '@/lib/database';
-import Order from '@/lib/database/models/order.model';
+import Ticket from '@/lib/database/models/ticket.model';
 import User from '@/lib/database/models/user.model';
+import Event from '@/lib/database/models/event.model';
 import { handleError } from '@/lib/utils';
-import { Schema } from 'mongoose';
 
 export async function validateTicket(ticketId: string) {
     try {
         await connectToDatabase();
 
-        // 1. Buscar la Orden en la BD por su transactionId
-        const order = await Order.findOne({ transactionId: ticketId })
+        // 1. Buscar el Ticket en la BD por su ticketId (UUID)
+        const ticket = await Ticket.findOne({ ticketId: ticketId })
             .populate({
                 path: 'buyer',
                 model: User,
@@ -19,38 +19,37 @@ export async function validateTicket(ticketId: string) {
             })
             .populate({
                 path: 'event',
-                model: 'Event',
+                model: Event,
                 select: 'title'
             });
 
         // 2. Si no existe: Retornar error "Ticket Inválido"
-        if (!order) {
+        if (!ticket) {
             return { success: false, message: 'Ticket Inválido' };
         }
 
-        // 3. Si isUsed es true: Retornar error "Ticket YA Usado / Duplicado"
-        if (order.isUsed) {
+        // 3. Si isUsed es true: Retornar error "Ticket YA Usado"
+        if (ticket.isUsed) {
             return { success: false, message: 'Ticket YA Usado / Duplicado' };
         }
 
         // 4. Si todo está bien:
         // - Actualizar isUsed a true
         // - Actualizar scannedAt a la fecha actual
-        order.isUsed = true;
-        order.scannedAt = new Date();
-        await order.save();
+        ticket.isUsed = true;
+        ticket.scannedAt = new Date();
+        await ticket.save();
 
-        const buyerName = order.buyer ? `${order.buyer.firstName} ${order.buyer.lastName}` : 'Nombre no disponible';
-        const eventTitle = order.event?.title || 'Evento Desconocido';
+        const buyerName = ticket.buyer ? `${ticket.buyer.firstName} ${ticket.buyer.lastName}` : 'Nombre no disponible';
+        const eventTitle = ticket.event?.title || 'Evento Desconocido';
 
         // - Retornar éxito
-        // IMPORTANTE: Devolvemos objetos planos (strings/numbers) para evitar errores de serialización "buffer"
         return {
             success: true,
             message: `Acceso Permitido - ${buyerName}`,
             ticketInfo: {
                 eventTitle: eventTitle,
-                quantity: JSON.parse(JSON.stringify(order.quantity)) // Asegurar que sea número plano
+                ticketNumber: ticket.ticketNumber
             }
         };
 

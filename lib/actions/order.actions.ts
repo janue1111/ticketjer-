@@ -8,6 +8,7 @@ import { handleError } from '../utils';
 import { connectToDatabase } from '../database';
 import Order from '../database/models/order.model';
 import Event from '../database/models/event.model';
+import Ticket from '../database/models/ticket.model';
 import { ObjectId } from 'mongodb';
 import User from '../database/models/user.model';
 
@@ -309,13 +310,44 @@ export async function updateOrderByTransactionId(transactionId: string): Promise
     const orderToUpdate = await Order.findOne({ transactionId: transactionId });
 
     if (!orderToUpdate) {
-      console.error(`Error en server action: Orden no encontrada con el ID de transacción: ${transactionId}`);
+      console.error(`❌ Error: Orden no encontrada con transactionId: ${transactionId}`);
       return { success: false, order: null, error: 'Orden no encontrada con el ID de transacción proporcionado.' };
     }
 
-    // Si la orden ya está completada, simplemente la devolvemos con éxito.
+    console.log(`📦 Orden encontrada: ${orderToUpdate._id} | Status: ${orderToUpdate.status} | Quantity: ${orderToUpdate.quantity}`);
+
+    // VERIFICAR TICKETS EXISTENTES (importante para evitar duplicados)
+    const existingTicketsCount = await Ticket.countDocuments({ order: orderToUpdate._id });
+    console.log(`🎫 Tickets existentes: ${existingTicketsCount}`);
+
+    // Si la orden ya está completada
     if (orderToUpdate.status === 'completed') {
-      console.log(`Info en server action: La orden con ID de transacción ${transactionId} ya estaba completada.`);
+      console.log(`ℹ️ La orden ya estaba completada.`);
+
+      // Si faltan tickets, generarlos
+      if (existingTicketsCount < orderToUpdate.quantity) {
+        const ticketsToGenerate = orderToUpdate.quantity - existingTicketsCount;
+        console.log(`⚠️ Faltan ${ticketsToGenerate} tickets. Generando...`);
+
+        const ticketsToCreate = [];
+        for (let i = existingTicketsCount + 1; i <= orderToUpdate.quantity; i++) {
+          const ticketId = crypto.randomUUID();
+          ticketsToCreate.push({
+            ticketId: ticketId,
+            order: orderToUpdate._id,
+            event: orderToUpdate.event,
+            buyer: orderToUpdate.buyer,
+            ticketNumber: i,
+            isUsed: false,
+          });
+        }
+
+        await Ticket.insertMany(ticketsToCreate);
+        console.log(`✅ ${ticketsToCreate.length} tickets generados para orden existente.`);
+      } else {
+        console.log(`✅ La orden ya tiene todos los tickets necesarios (${existingTicketsCount}/${orderToUpdate.quantity})`);
+      }
+
       // Obtener los datos completos con populate
       const completeOrder = await Order.findById(orderToUpdate._id)
         .populate({
@@ -330,7 +362,8 @@ export async function updateOrderByTransactionId(transactionId: string): Promise
       return { success: true, order: JSON.parse(JSON.stringify(completeOrder)), error: null };
     }
 
-    // Actualizar el estado de la orden a 'completed' y obtener datos completos
+    // ORDEN NUEVA: Actualizar status a 'completed'
+    console.log(`🔄 Actualizando orden a 'completed'...`);
     const updatedOrder = await Order.findByIdAndUpdate(
       orderToUpdate._id,
       { status: 'completed' },
@@ -347,15 +380,70 @@ export async function updateOrderByTransactionId(transactionId: string): Promise
       });
 
     if (!updatedOrder) {
-      console.error(`Error en server action: La orden con ID ${orderToUpdate._id} fue encontrada pero no pudo ser actualizada.`);
+      console.error(`❌ Error: La orden ${orderToUpdate._id} no pudo ser actualizada.`);
       return { success: false, order: null, error: 'La orden fue encontrada pero no pudo ser actualizada.' };
     }
 
-    console.log(`Éxito en server action: La orden con ID de transacción ${transactionId} ha sido actualizada a "completed".`);
+    // GENERAR TICKETS solo si NO existen
+    if (existingTicketsCount === 0) {
+      console.log(`🎫 Generando ${updatedOrder.quantity} tickets nuevos...`);
+
+      const ticketsToCreate = [];
+      for (let i = 1; i <= updatedOrder.quantity; i++) {
+        const ticketId = crypto.randomUUID();
+        ticketsToCreate.push({
+          ticketId: ticketId,
+          order: updatedOrder._id,
+          event: updatedOrder.event._id,
+          buyer: updatedOrder.buyer._id,
+          ticketNumber: i,
+          isUsed: false,
+        });
+      }
+
+      // Usar insertMany con opción ordered: false para mejor manejo de duplicados
+      try {
+        await Ticket.insertMany(ticketsToCreate, { ordered: false });
+        console.log(`✅ ${ticketsToCreate.length} tickets generados exitosamente.`);
+      } catch (insertError: any) {
+        // Si hay error de duplicados (E11000), algunos tickets podrían haberse insertado
+        if (insertError.code === 11000) {
+          console.warn(`⚠️ Algunos tickets ya existían (duplicados detectados). Continuando...`);
+          const finalCount = await Ticket.countDocuments({ order: updatedOrder._id });
+          console.log(`📊 Total de tickets después de insert: ${finalCount}/${updatedOrder.quantity}`);
+        } else {
+          throw insertError; // Re-lanzar si es otro tipo de error
+        }
+      }
+    } else if (existingTicketsCount < updatedOrder.quantity) {
+      // Si existen algunos pero no todos, generar los faltantes
+      const ticketsToGenerate = updatedOrder.quantity - existingTicketsCount;
+      console.log(`⚠️ Solo existen ${existingTicketsCount} tickets. Generando ${ticketsToGenerate} faltantes...`);
+
+      const ticketsToCreate = [];
+      for (let i = existingTicketsCount + 1; i <= updatedOrder.quantity; i++) {
+        const ticketId = crypto.randomUUID();
+        ticketsToCreate.push({
+          ticketId: ticketId,
+          order: updatedOrder._id,
+          event: updatedOrder.event._id,
+          buyer: updatedOrder.buyer._id,
+          ticketNumber: i,
+          isUsed: false,
+        });
+      }
+
+      await Ticket.insertMany(ticketsToCreate);
+      console.log(`✅ ${ticketsToCreate.length} tickets faltantes generados.`);
+    } else {
+      console.log(`✅ La orden ya tiene todos los tickets necesarios (${existingTicketsCount}/${updatedOrder.quantity})`);
+    }
+
+    console.log(`✅ Orden ${transactionId} procesada exitosamente.`);
     return { success: true, order: JSON.parse(JSON.stringify(updatedOrder)), error: null };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido en la base de datos.';
-    console.error(`Error catastrófico en server action (updateOrderByTransactionId): ${errorMessage}`);
+    console.error(`❌ Error catastrófico en updateOrderByTransactionId: ${errorMessage}`);
     return { success: false, order: null, error: errorMessage };
   }
 }

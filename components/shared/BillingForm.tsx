@@ -83,15 +83,15 @@ const BillingForm: React.FC<BillingFormProps> = ({ onSubmit, isProcessing }) => 
         <div className="w-full max-w-2xl mx-auto">
             {/* Card Container */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+                {/* Header - Fucsia #D5006D */}
+                <div className="px-6 py-5" style={{ backgroundColor: '#D5006D' }}>
                     <div className="flex items-center gap-3">
                         <div className="bg-white/20 p-2 rounded-lg">
                             <FileText className="h-6 w-6 text-white" />
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-white">Paso 2: Tus Datos</h2>
-                            <p className="text-blue-100 text-sm">Ingresa tus datos de facturación</p>
+                            <p className="text-white/90 text-sm">Ingresa tus datos de facturación</p>
                         </div>
                     </div>
                 </div>
@@ -279,7 +279,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ onSubmit, isProcessing }) => 
                                 <Button
                                     type="submit"
                                     disabled={isProcessing}
-                                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg h-auto"
+                                    className="w-full font-bold py-4 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-lg h-auto text-white hover:brightness-110"
+                                    style={{ backgroundColor: '#00BFA5' }}
                                 >
                                     {isProcessing ? (
                                         <span className="flex items-center justify-center">

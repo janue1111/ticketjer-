@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { IEvent } from "@/lib/database/models/event.model";
 import CheckoutClient from "./CheckoutClient";
 
+export const dynamic = 'force-dynamic';
 
 
 const CheckoutPage = async ({ params }: { params: Promise<{ id: string }> }) => {

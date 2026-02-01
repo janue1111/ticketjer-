@@ -3,6 +3,8 @@ import { getEventById } from "@/lib/actions/event.actions";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 type UpdateEventProps = {
   params?: Promise<{
     id: string;

@@ -1,9 +1,11 @@
-import Search  from '@/components/shared/Search'
+import Search from '@/components/shared/Search'
 import { getOrdersByEvent } from '@/lib/actions/order.actions'
 import { formatDateTime, formatPrice } from '@/lib/utils'
 import { SearchParamProps } from '@/types'
 import { IOrderItem } from '@/lib/database/models/order.model'
 import Image from "next/image"
+
+export const dynamic = 'force-dynamic';
 
 const Orders = async ({ searchParams }: SearchParamProps) => {
   const resolvedSearchParams = (await searchParams) ?? {}
@@ -49,16 +51,16 @@ const Orders = async ({ searchParams }: SearchParamProps) => {
                       className="p-regular-14 lg:p-regular-16 border-b "
                       style={{ boxSizing: 'border-box' }}>
                       <td className="min-w-[250px] py-4 text-primary-500">
-  <div className="flex items-center">
-    <Image 
-      src="/assets/images/logo3.svg" 
-      alt="TicketiHub Logo" 
-      width={20}  // Adjusted width
-      height={20} // Adjusted height
-    />
-    <span className="ml-2">{row._id}</span>
-  </div>
-</td>
+                        <div className="flex items-center">
+                          <Image
+                            src="/assets/images/logo3.svg"
+                            alt="TicketiHub Logo"
+                            width={20}  // Adjusted width
+                            height={20} // Adjusted height
+                          />
+                          <span className="ml-2">{row._id}</span>
+                        </div>
+                      </td>
                       <td className="min-w-[200px] flex-1 py-4 pr-4">{row.eventTitle}</td>
                       <td className="min-w-[150px] py-4">{row.buyer}</td>
                       <td className="min-w-[100px] py-4">

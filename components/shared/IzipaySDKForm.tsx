@@ -8,7 +8,8 @@ interface IzipaySDKFormProps {
   eventName: string;
   amount: number;
   buyerId: string;
-  billingDetails: BillingDetails; // Nueva prop
+  quantity: number; // 🔥 NUEVA PROP para cantidad de entradas
+  billingDetails: BillingDetails;
   onSuccess?: () => void;
   onError?: (error: string) => void;
 }
@@ -25,7 +26,8 @@ export default function IzipaySDKForm({
   eventName,
   amount,
   buyerId,
-  billingDetails, // Usar la nueva prop
+  quantity, // 🔥 Recibir quantity como prop
+  billingDetails,
   onSuccess,
   onError
 }: IzipaySDKFormProps) {
@@ -78,7 +80,7 @@ export default function IzipaySDKForm({
         body: JSON.stringify({
           eventId: eventId,
           buyerId: buyerId,
-          quantity: 1,
+          quantity: quantity, // 🔥 Usar la prop en lugar de hardcodear 1
           totalAmount: amount.toString(),
         }),
       });
@@ -233,8 +235,8 @@ export default function IzipaySDKForm({
       items: [{
         item_id: eventId,
         item_name: eventName,
-        price: amount,
-        quantity: 1,
+        price: amount / quantity, // Precio por unidad
+        quantity: quantity, // 🔥 Cantidad real
       }],
     });
 
@@ -245,8 +247,8 @@ export default function IzipaySDKForm({
     <div className="izipay-form-container w-full max-w-md mx-auto">
       {/* Card Container */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+        {/* Header - Fucsia #D5006D */}
+        <div className="px-6 py-4" style={{ backgroundColor: '#D5006D' }}>
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -263,7 +265,7 @@ export default function IzipaySDKForm({
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-semibold text-gray-900 text-lg">{eventName}</p>
-                <p className="text-sm text-gray-500">1 entrada</p>
+                <p className="text-sm text-gray-500">{quantity} {quantity === 1 ? 'entrada' : 'entradas'}</p>
               </div>
             </div>
 
@@ -292,7 +294,8 @@ export default function IzipaySDKForm({
             <button
               type="submit"
               disabled={isLoading || !isScriptLoaded}
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none text-lg"
+              className="w-full font-bold py-4 px-6 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:shadow-none text-lg text-white hover:brightness-110"
+              style={{ backgroundColor: '#00BFA5' }}
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
