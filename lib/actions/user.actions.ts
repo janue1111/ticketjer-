@@ -79,3 +79,75 @@ export async function deleteUser(clerkId: string) {
     handleError(error)
   }
 }
+
+// GET USER BY CLERK ID
+export async function getUserByClerkId(clerkId: string) {
+  try {
+    await connectToDatabase()
+
+    const user = await User.findOne({ clerkId })
+
+    if (!user) throw new Error('User not found')
+    return JSON.parse(JSON.stringify(user))
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+// UPDATE USER ROLE (Admin only)
+export async function updateUserRole(userId: string, role: 'user' | 'organizer' | 'admin') {
+  try {
+    await connectToDatabase()
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true }
+    )
+
+    if (!updatedUser) throw new Error('User not found')
+
+    revalidatePath('/admin/users')
+    return JSON.parse(JSON.stringify(updatedUser))
+  } catch (error) {
+    handleError(error)
+  }
+}
+
+// GET ALL USERS (Admin only)
+export async function getAllUsers({ page = 1, limit = 10, searchString = '' }: {
+  page?: number
+  limit?: number
+  searchString?: string
+}) {
+  try {
+    await connectToDatabase()
+
+    const query = searchString
+      ? {
+        $or: [
+          { firstName: { $regex: searchString, $options: 'i' } },
+          { lastName: { $regex: searchString, $options: 'i' } },
+          { email: { $regex: searchString, $options: 'i' } },
+          { username: { $regex: searchString, $options: 'i' } },
+        ],
+      }
+      : {}
+
+    const skipAmount = (page - 1) * limit
+
+    const users = await User.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skipAmount)
+      .limit(limit)
+
+    const usersCount = await User.countDocuments(query)
+
+    return {
+      data: JSON.parse(JSON.stringify(users)),
+      totalPages: Math.ceil(usersCount / limit),
+    }
+  } catch (error) {
+    handleError(error)
+  }
+}

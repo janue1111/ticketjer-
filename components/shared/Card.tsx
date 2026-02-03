@@ -17,7 +17,12 @@ type CardProps = {
 
 const Card = ({ event, hasOrderLink, hidePrice, orderQuantity, orderId }: CardProps) => {
   const { userId } = useAuth();
-  const isEventCreator = event.organizer._id.toString() === userId;
+
+  // Check if user is event creator by comparing Clerk userId with organizer's clerkId
+  // Defensive check: organizer might be null for old events
+  const isEventCreator = userId && event.organizer
+    ? event.organizer.clerkId === userId
+    : false;
 
   // Precio más bajo de la fase activa
   const activePhase = event.pricingPhases?.find((phase) => phase.active);

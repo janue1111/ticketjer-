@@ -56,33 +56,34 @@ export async function POST(req: Request) {
   const eventType = evt.type;
 
   // USER CREATION
-  if(eventType === 'user.created'){
-    const {id,email_addresses,image_url,first_name,last_name,username} = evt.data
-    const user={
-        clerkId:id,
-        email:email_addresses[0].email_address,
-        username: username || email_addresses[0].email_address,
-        firstName: first_name || '',
-        lastName: last_name || '',
-        photo:image_url,
+  if (eventType === 'user.created') {
+    const { id, email_addresses, image_url, first_name, last_name, username } = evt.data
+    const user = {
+      clerkId: id,
+      email: email_addresses[0].email_address,
+      username: username || email_addresses[0].email_address,
+      firstName: first_name || '',
+      lastName: last_name || '',
+      photo: image_url,
+      role: 'user' as const, // Default role for new users
     }
-    const newUser= await createUser(user);
+    const newUser = await createUser(user);
 
-    if (newUser){
-        const client = await clerkClient();
-        await client.users.updateUserMetadata(id,{
-            publicMetadata:{
-                userId:newUser._id
-            }
-        })
+    if (newUser) {
+      const client = await clerkClient();
+      await client.users.updateUserMetadata(id, {
+        publicMetadata: {
+          userId: newUser._id
+        }
+      })
     }
 
-    return NextResponse.json({message:'Ok',user:newUser})
+    return NextResponse.json({ message: 'Ok', user: newUser })
   }
 
   // USER UPDATE
   if (eventType === 'user.updated') {
-    const {id, image_url, first_name, last_name, username } = evt.data
+    const { id, image_url, first_name, last_name, username } = evt.data
 
     const user = {
       firstName: first_name || '',
@@ -104,7 +105,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ message: 'OK', user: deletedUser })
   }
- 
+
   return new Response('', { status: 200 })
 }
 

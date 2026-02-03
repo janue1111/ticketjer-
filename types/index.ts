@@ -1,4 +1,6 @@
 // ====== USER PARAMS
+export type UserRole = 'user' | 'organizer' | 'admin'
+
 export type CreateUserParams = {
   clerkId: string
   firstName: string
@@ -6,6 +8,7 @@ export type CreateUserParams = {
   username: string
   email: string
   photo: string
+  role?: UserRole
 }
 
 export type UpdateUserParams = {
@@ -13,6 +16,17 @@ export type UpdateUserParams = {
   lastName: string
   username: string
   photo: string
+}
+
+export type UpdateUserRoleParams = {
+  userId: string
+  role: UserRole
+}
+
+export type GetAllUsersParams = {
+  page: number
+  limit?: number
+  searchString?: string
 }
 
 // ====== EVENT PARAMS
@@ -116,7 +130,7 @@ export type GetRelatedEventsByCategoryParams = {
   page: number | string
 }
 
-  export type Event = {
+export type Event = {
   _id: string
   title: string
   slug?: string
@@ -165,7 +179,7 @@ export type CreateCategoryParams = {
 }
 
 // ====== ORDER PARAMS
-  export type CheckoutOrderParams = {
+export type CheckoutOrderParams = {
   eventTitle: string
   eventId: string
   price: string

@@ -23,22 +23,22 @@ const getCategoryByName = async (name: string) => {
 
 const populateEvent = (query: any) => {
   return query
-    .populate({ path: 'organizer', model: User, select: '_id firstName lastName' })
+    .populate({ path: 'organizer', model: User, select: '_id firstName lastName clerkId' })
     .populate({ path: 'category', model: Category, select: '_id name' })
 }
 
 // GENERATE UNIQUE SLUG
 const generateUniqueSlug = async (baseSlug: string): Promise<string> => {
   await connectToDatabase()
-  
+
   let slug = baseSlug
   let counter = 1
-  
+
   while (await Event.findOne({ slug })) {
     slug = `${baseSlug}-${counter}`
     counter++
   }
-  
+
   return slug
 }
 
@@ -50,14 +50,19 @@ export async function createEvent({ userId, event, path }: CreateEventParams) {
     const organizer = await User.findOne({ clerkId: userId })
     if (!organizer) throw new Error('Organizer not found')
 
+    // Check if user has permission to create events
+    if (organizer.role !== 'organizer' && organizer.role !== 'admin') {
+      throw new Error('No tienes permisos para crear eventos. Contacta al administrador.')
+    }
+
     // Generate unique slug if provided
     const uniqueSlug = event.slug ? await generateUniqueSlug(event.slug) : undefined
 
-    const newEvent = await Event.create({ 
-      ...event, 
+    const newEvent = await Event.create({
+      ...event,
       slug: uniqueSlug,
-      category: event.categoryId, 
-      organizer: organizer._id 
+      category: event.categoryId,
+      organizer: organizer._id
     })
     revalidatePath(path)
 
